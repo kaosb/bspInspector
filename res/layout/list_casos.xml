@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/RelativeLayout01"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+    
+	<LinearLayout
+        android:id="@+id/linearLayoutHead"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:orientation="horizontal"
+        android:background="#0A0C29" >
+    </LinearLayout>
+    
+	<LinearLayout
+        android:id="@+id/linearLayoutFoot"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:orientation="horizontal"
+        android:background="#0A0C29" >
+
+        <TextView
+            android:id="@+id/textViewOnline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textSize="14dp"
+            android:text="" />
+        
+    </LinearLayout>
+
+	<LinearLayout
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_above="@+id/linearLayoutFoot"
+	    android:layout_alignParentLeft="true"
+	    android:layout_alignParentRight="true"
+	    android:layout_below="@+id/linearLayoutHead"
+	    android:background="#CFDCE9"
+	    android:orientation="vertical" >
+        
+		<LinearLayout
+            android:id="@+id/linearLayoutLogo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#F1F5F9" >
+
+            <ImageView
+                android:id="@+id/imageViewLog"
+                android:contentDescription="@string/app_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:src="@drawable/logo_small"
+                android:layout_gravity="center_vertical|center_horizontal" />
+            
+        </LinearLayout>
+        
+		<ListView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/list_view" />
+
+	</LinearLayout>
+
+</RelativeLayout>

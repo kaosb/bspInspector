@@ -33,13 +33,11 @@ public class dashboard extends Activity {
 		
 		ImageView btnDescargar = (ImageView) findViewById(R.id.imageView1);
 		btnDescargar.setOnClickListener(new OnClickListener() {
-			public void onClick(View arg0) { //--clickOnListItem
-				/*Intent myIntent = new Intent(listaCasos.this, formulario1.class);
-				myIntent.putExtra("cod_ubicacion", listItem.getCod_ubicacion());
-				myIntent.putExtra("glosa_marca", listItem.getGlosa_marca());
-				myIntent.putExtra("glosa_modelo", listItem.getGlosa_modelo());
-				myIntent.putExtra("direccion", listItem.getDireccion());
-				startActivity(myIntent);*/
+			public void onClick(View arg0) {
+				Intent myIntent = new Intent(dashboard.this, getNuevosCasos.class);
+				myIntent.putExtra("user", user);
+				myIntent.putExtra("pass", pass);
+				startActivity(myIntent);
 			}
 		});
 		

@@ -22,7 +22,6 @@ public class casos {
     	XmlPullParser parser = Xml.newPullParser();
     	try {
     		parser.setInput(xmlStream, "UTF-8");
-
     		int event = parser.next();
     		
     		while(event != XmlPullParser.END_DOCUMENT) {
