@@ -33,9 +33,7 @@ public final class R {
         public static final int LinearLayoutCheckbox=0x7f060018;
         public static final int LinearLayoutMensaje=0x7f06001a;
         public static final int RelativeLayout01=0x7f06001b;
-        public static final int RelativeLayout02=0x7f06001c;
-        public static final int RelativeLayout03=0x7f06001d;
-        public static final int RelativeLayout04=0x7f06001e;
+        public static final int button1=0x7f06001d;
         public static final int checkBoxRecordar=0x7f060019;
         public static final int editText1=0x7f060012;
         public static final int editText2=0x7f060015;
@@ -49,8 +47,9 @@ public final class R {
         public static final int linearLayoutFoot=0x7f060002;
         public static final int linearLayoutHead=0x7f060000;
         public static final int linearLayoutLogo=0x7f060005;
-        public static final int list_view=0x7f06001f;
-        public static final int rlt_main=0x7f060020;
+        public static final int list_view=0x7f06001e;
+        public static final int rlt_main=0x7f06001f;
+        public static final int textView1=0x7f06001c;
         public static final int textViewOnline=0x7f060003;
         public static final int textViewPassword=0x7f060014;
         public static final int textViewSaludo=0x7f060001;
@@ -59,19 +58,21 @@ public final class R {
         public static final int textViewSepusr=0x7f060010;
         public static final int textViewTitulo=0x7f06000e;
         public static final int textViewUsuario=0x7f060011;
-        public static final int tv_address=0x7f060023;
-        public static final int tv_cod=0x7f060021;
-        public static final int tv_description=0x7f060022;
-        public static final int txtTest=0x7f060024;
+        public static final int tv_address=0x7f060022;
+        public static final int tv_cod=0x7f060020;
+        public static final int tv_description=0x7f060021;
+        public static final int txtTest=0x7f060023;
     }
     public static final class layout {
         public static final int dashboard=0x7f030000;
         public static final int dologin=0x7f030001;
-        public static final int home=0x7f030002;
-        public static final int list_item=0x7f030003;
-        public static final int main=0x7f030004;
+        public static final int get_nuevos_casos=0x7f030002;
+        public static final int list_casos=0x7f030003;
+        public static final int list_item=0x7f030004;
+        public static final int main=0x7f030005;
     }
     public static final class string {
+        public static final int OK=0x7f04000e;
         public static final int address=0x7f040006;
         public static final int app_name=0x7f040002;
         public static final int cod=0x7f040007;

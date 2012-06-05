@@ -18,5 +18,6 @@
         <activity android:name=".listaCasos"/>
         <activity android:name=".sectionSelector"/>
         <activity android:name=".dashboard"/>
+        <activity android:name=".getNuevosCasos"/>
     </application>
 </manifest>
