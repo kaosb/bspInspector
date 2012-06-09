@@ -15,4 +15,7 @@
     <string name="pass"> PASSWORD </string>
     <string name="recordar"> RECORDAR </string>
     <string name="OK"> OK </string>
+    <string name="ncaso"> Nº DE CASO </string>
+    <string name="estado"> ESTADO </string>
+    <string name="direccion"> DIRECCIÓN </string>
 </resources>
