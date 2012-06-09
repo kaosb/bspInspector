@@ -19,11 +19,13 @@ public final class R {
         public static final int btn_entrar=0x7f020002;
         public static final int btn_ocuenta=0x7f020003;
         public static final int btn_opciones=0x7f020004;
-        public static final int fail=0x7f020005;
-        public static final int ic_launcher=0x7f020006;
-        public static final int logo_big=0x7f020007;
-        public static final int logo_small=0x7f020008;
-        public static final int ok=0x7f020009;
+        public static final int btn_visitar=0x7f020005;
+        public static final int fail=0x7f020006;
+        public static final int greenball=0x7f020007;
+        public static final int ic_launcher=0x7f020008;
+        public static final int logo_big=0x7f020009;
+        public static final int logo_small=0x7f02000a;
+        public static final int ok=0x7f02000b;
     }
     public static final class id {
         public static final int LinearBotonera=0x7f060007;
@@ -47,28 +49,33 @@ public final class R {
         public static final int linearLayoutFoot=0x7f060002;
         public static final int linearLayoutHead=0x7f060000;
         public static final int linearLayoutLogo=0x7f060005;
-        public static final int list_view=0x7f06001e;
-        public static final int rlt_main=0x7f06001f;
+        public static final int list_view=0x7f060027;
         public static final int textView1=0x7f06001c;
+        public static final int textViewEstado=0x7f06001f;
+        public static final int textViewEstadotxt=0x7f060021;
         public static final int textViewOnline=0x7f060003;
         public static final int textViewPassword=0x7f060014;
         public static final int textViewSaludo=0x7f060001;
         public static final int textViewSep=0x7f06000f;
         public static final int textViewSeppss=0x7f060013;
         public static final int textViewSepusr=0x7f060010;
+        public static final int textViewSepusr2=0x7f060022;
+        public static final int textViewSepusr3=0x7f060025;
+        public static final int textViewSepusr4=0x7f060026;
         public static final int textViewTitulo=0x7f06000e;
         public static final int textViewUsuario=0x7f060011;
-        public static final int tv_address=0x7f060022;
-        public static final int tv_cod=0x7f060020;
-        public static final int tv_description=0x7f060021;
-        public static final int txtTest=0x7f060023;
+        public static final int textViewnDireccion=0x7f060023;
+        public static final int textViewnDirecciontxt=0x7f060024;
+        public static final int textViewncaso=0x7f06001e;
+        public static final int textViewncasotxt=0x7f060020;
+        public static final int txtTest=0x7f060028;
     }
     public static final class layout {
         public static final int dashboard=0x7f030000;
         public static final int dologin=0x7f030001;
         public static final int get_nuevos_casos=0x7f030002;
-        public static final int list_casos=0x7f030003;
-        public static final int list_item=0x7f030004;
+        public static final int item_casos=0x7f030003;
+        public static final int list_casos=0x7f030004;
         public static final int main=0x7f030005;
     }
     public static final class string {
@@ -77,8 +84,11 @@ public final class R {
         public static final int app_name=0x7f040002;
         public static final int cod=0x7f040007;
         public static final int description=0x7f040005;
+        public static final int direccion=0x7f040011;
+        public static final int estado=0x7f040010;
         public static final int hello=0x7f040001;
         public static final int name=0x7f040004;
+        public static final int ncaso=0x7f04000f;
         public static final int ok=0x7f040003;
         public static final int pass=0x7f04000c;
         public static final int recordar=0x7f04000d;

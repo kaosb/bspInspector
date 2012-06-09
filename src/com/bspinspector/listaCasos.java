@@ -1,13 +1,19 @@
 package com.bspinspector;
 
+import java.io.File;
 import java.util.ArrayList;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,89 +24,100 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class listaCasos extends Activity implements OnClickListener{
-	
-	private static final String SOAP_ACTION = "urn:ServiciosBspAction";
-	private static final String URL = "http://w4.bsp.cl/ws_bsp/servicio/BspServices.php";
+public class listaCasos extends Activity {
 
+	private String user;
+	private String pass;
+	private TextView isonline;
 	private ListView listview;
 	private ArrayList<caso> mListItem;
 	
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.list_casos);
-
+		
 		listview = (ListView) findViewById(R.id.list_view);
         ArrayList<caso> list = new ArrayList<caso>();
         caso caso;
-        
-        
-        /**
-         * Cliente SOAP
-         * */
-        soapClient cliente = new soapClient();
-        
-        /**
-         * Envelope RUTA
-         * */
-        Bundle bundle = getIntent().getExtras();
-        String envelopeRuta = "<soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-        				+"<soapenv:Header/>"
-        				+"<soapenv:Body>"
-        				+"<usr_inspector xsi:type=\"xsd:string\"><![CDATA[<carga><usr_inspector>"+bundle.getString("user")+"</usr_inspector></carga>]]></usr_inspector>"
-        				+"</soapenv:Body>"
-        				+"</soapenv:Envelope>";
-        
-        String responseRuta = cliente.CallWebService(URL,SOAP_ACTION,envelopeRuta);
-        
-        /**
-         * Parser RUTA
-         * */
-        casos ruta = new casos();
-        ruta.parseRuta(responseRuta);
-        Document doc;
-        		
-        for(int i = 0;i+1<=ruta.inspecciones.length;i++){
-        	
-        	doc = Jsoup.parse(ruta.inspecciones[i]);
-        	/*Creo un nuevo objeto caso para desplegar esta informacion*/
-	        caso = new caso();
-	        caso.setCod_ubicacion(doc.select("cod_ubicacion").text().trim());
-	        caso.setCod_ramo(doc.select("cod_ramo").text().trim());
-	        caso.setGlosa_ramo(doc.select("glosa_ramo").text().trim());
-	        caso.setCod_cia(doc.select("cod_cia").text().trim());
-	        caso.setGlosa_cia(doc.select("glosa_cia").text().trim());
-	        caso.setNom_asegurado(doc.select("nom_asegurado").text().trim());
-	        caso.setNom_contacto(doc.select("nom_contacto").text().trim());
-	        caso.setTelefono(doc.select("telefono").text().trim());
-	        caso.setDireccion(doc.select("direccion").text().trim());
-	        caso.setCod_comuna(doc.select("cod_comuna").text().trim());
-	        caso.setGlosa_comuna(doc.select("glosa_comuna").text().trim());
-	        caso.setGlosa_marca(doc.select("glosa_marca").text().trim());
-	        caso.setGlosa_modelo(doc.select("glosa_modelo").text().trim());
-	        caso.setComentario(doc.select("comentario").text().trim());
-	        caso.setPatente(doc.select("patente").text().trim());
-	        caso.setCorredor(doc.select("corredor").text().trim());
-	        caso.setObservaciones(doc.select("observaciones").text().trim());
-	        caso.setLleva_decla_datos_adic(doc.select("lleva_decla_datos_adic").text().trim());
-	        caso.setLleva_propuesta(doc.select("lleva_propuesta").text().trim());
-	        caso.setLleva_poliza(doc.select("lleva_poliza").text().trim());
-	        caso.setFecha_visita(doc.select("fecha_visita").text().trim());
-	        caso.setHora_visita(doc.select("hora_visita").text().trim());
-	        
-	        /*Lo almaceno en una BD local*/
-	        
-	        
-	        /*Lo agrego a la lista*/
-	        list.add(caso);
-        }
-        
-		mListItem = list;
-		listview.setAdapter(new ListAdapter(listaCasos.this, R.id.list_view, mListItem));
 
+		/*Get DATA*/
+		Bundle bundle = getIntent().getExtras();
+		this.user = bundle.getString("user");
+		this.pass = bundle.getString("pass");
+		
+		/*Saludo Bienvenida*/
+		TextView mensajeBienvenida = (TextView) findViewById(R.id.textViewSaludo);
+		mensajeBienvenida.setText("Bienvenido "+this.user);
+		
+		isonline = (TextView) findViewById(R.id.textViewOnline);
+		alertOnline();
+
+			
+		/*Verificar Archivo*/
+		File dbfile = getdDBFile();
+		
+		if(dbfile.exists()){
+			SQLiteDatabase db;
+			db = SQLiteDatabase.openOrCreateDatabase(dbfile, null);
+			
+	    	Cursor c = db.query("tbl_casos",
+					new String [] {"cod_ubicacion","cod_ramo","glosa_ramo","cod_cia","glosa_cia","nom_asegurado","nom_contacto","telefono","direccion","cod_comuna","glosa_comuna","glosa_marca","glosa_modelo","comentario","patente","corredor","observaciones","lleva_decla_datos_adic","lleva_propuesta","lleva_poliza","fecha_visita","hora_visita","datecreate","status"},
+					null,
+					null,
+					null,
+					null,
+					null);
+	    	
+	    	/*Recorrer BD*/
+	    	if(c.moveToFirst()){
+		        do{
+		        	/*Creo un nuevo objeto caso para desplegar esta informacion*/
+			        caso = new caso();
+			        caso.setCod_ubicacion(c.getString(0));
+			        caso.setCod_ramo(c.getString(1));
+			        caso.setGlosa_ramo(c.getString(2));
+			        caso.setCod_cia(c.getString(3));
+			        caso.setGlosa_cia(c.getString(4));
+			        caso.setNom_asegurado(c.getString(5));
+			        caso.setNom_contacto(c.getString(6));
+			        caso.setTelefono(c.getString(7));
+			        caso.setDireccion(c.getString(8));
+			        caso.setCod_comuna(c.getString(9));
+			        caso.setGlosa_comuna(c.getString(10));
+			        caso.setGlosa_marca(c.getString(11));
+			        caso.setGlosa_modelo(c.getString(12));
+			        caso.setComentario(c.getString(13));
+			        caso.setPatente(c.getString(14));
+			        caso.setCorredor(c.getString(15));
+			        caso.setObservaciones(c.getString(16));
+			        caso.setLleva_decla_datos_adic(c.getString(17));
+			        caso.setLleva_propuesta(c.getString(18));
+			        caso.setLleva_poliza(c.getString(19));
+			        caso.setFecha_visita(c.getString(20));
+			        caso.setHora_visita(c.getString(21));
+			        caso.setStatus(c.getString(23));
+			        
+			        /*Lo almaceno en una BD local*/
+			        
+			        
+			        /*Lo agrego a la lista*/
+			        list.add(caso);
+		        }while(c.moveToNext());
+	    	}
+			
+			mListItem = list;
+			listview.setAdapter(new ListAdapter(listaCasos.this, R.id.list_view, mListItem));
+			c.close();
+			db.close();
+			
+		}else{
+			mensajeBD();
+		}
+		
 	}
-
+	
+	
 	/**
 	 * Existe para evitar conflicto
 	 * */
@@ -133,17 +150,37 @@ public class listaCasos extends Activity implements OnClickListener{
 			try{
 				if(view == null) {
 					LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-					view = vi.inflate(R.layout.list_item, null);
+					view = vi.inflate(R.layout.item_casos, null);
 				}
 				final caso listItem = (caso) mList.get(position);
 				if(listItem != null) {
 					// setting list_item views
-					((TextView) view.findViewById(R.id.tv_cod)).setText(listItem.getCod_ubicacion());
-					((TextView) view.findViewById(R.id.tv_description)).setText(listItem.getGlosa_marca()+" + "+listItem.getGlosa_modelo());
-					((TextView) view.findViewById(R.id.tv_address)).setText(listItem.getDireccion());
+					((TextView) view.findViewById(R.id.textViewncasotxt)).setText(listItem.getCod_ubicacion());
+					TextView status = (TextView) view.findViewById(R.id.textViewEstadotxt);
+					switch(Integer.parseInt(listItem.getStatus())){
+					case 0:
+						status.setText("Pendiente");
+						status.setBackgroundColor(Color.parseColor("#F4FA58"));
+						break;
+					case 1:
+						status.setText("Incompleto");
+						status.setBackgroundColor(Color.parseColor("#F4FA58"));
+						break;
+					case 2:
+						status.setText("Completo");
+						status.setBackgroundColor(Color.parseColor("#01DF01"));
+						break;
+					default:
+						status.setText("Indeterminado");
+						status.setBackgroundColor(Color.parseColor("#DF0101"));
+						break;
+					}
+					((TextView) view.findViewById(R.id.textViewnDirecciontxt)).setText(listItem.getDireccion());
 					view.setOnClickListener(new OnClickListener() {
 						public void onClick(View arg0) { //--clickOnListItem
 							Intent myIntent = new Intent(listaCasos.this, sectionSelector.class);
+							myIntent.putExtra("user", user);
+							myIntent.putExtra("pass", pass);
 							myIntent.putExtra("cod_ubicacion", listItem.getCod_ubicacion());
 							myIntent.putExtra("glosa_marca", listItem.getGlosa_marca());
 							myIntent.putExtra("glosa_modelo", listItem.getGlosa_modelo());
@@ -158,4 +195,70 @@ public class listaCasos extends Activity implements OnClickListener{
 			return view;
 		}
 	}
+	
+	
+    /**
+     * Alerta Online Offline
+     * */
+    public void alertOnline(){
+        isonline.setPadding(15, 0, 0, 0);
+        isonline.setTypeface(null, Typeface.BOLD);
+        if(connectionOK()){
+        	isonline.setText("ONLINE");
+        	isonline.setTextColor(Color.parseColor("#00FF00"));
+        }else{
+        	isonline.setText("OFFLINE");
+        	isonline.setTextColor(Color.parseColor("#FF0000"));
+        }
+    }
+    
+	/**
+	 * Verifica Conexion
+	 * */
+	public boolean connectionOK(){
+		ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+		NetworkInfo ni = cm.getActiveNetworkInfo();
+		if(ni!=null && ni.isConnected()){
+			Log.i("INTERNET", "conectado");
+			return true;
+		}else{
+			Log.i("INTERNET", "no conectado");
+			return false;
+		}
+	}
+
+	/**
+	 * Genera Mensaje sin BD cargar
+	 * */
+	public void mensajeBD(){
+		AlertDialog alertDialog = new AlertDialog.Builder(listaCasos.this).create();
+		alertDialog.setTitle("importante");
+		alertDialog.setMessage("Antes debes cargar los casos desde nuestros servidores.");
+		alertDialog.setButton("Cargar", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which){
+				Intent myIntent = new Intent(listaCasos.this, getNuevosCasos.class);
+				myIntent.putExtra("user", user);
+				myIntent.putExtra("pass", pass);
+				startActivity(myIntent);
+				finish();
+			}
+		});
+		alertDialog.setIcon(R.drawable.fail);
+		alertDialog.show();
+	}
+	
+	/**
+	 * GET Archivo DB
+	 * */
+	public File getdDBFile(){
+        File root = android.os.Environment.getExternalStorageDirectory();
+        File dir = new File (root.getAbsolutePath() + "/bspinspector/");
+        
+        if(dir.exists()==false) {
+        	dir.mkdirs();
+        }
+        File dbfile = new File(dir + "/casos.sqlite");
+        return dbfile;
+	}
+	
 }

@@ -26,6 +26,7 @@ public class caso {
 	private String lleva_poliza;
 	private String fecha_visita;
 	private String hora_visita;
+	private String status;
 
     /**
      * Setter & Getter
@@ -205,6 +206,14 @@ public class caso {
 
 	public void setHora_visita(String hora_visita) {
 		this.hora_visita = hora_visita;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 }
 
