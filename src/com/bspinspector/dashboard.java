@@ -17,20 +17,17 @@ public class dashboard extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.dashboard);
-		
+
 		/*Get DATA*/
 		Bundle bundle = getIntent().getExtras();
 		this.user = bundle.getString("user");
 		this.pass = bundle.getString("pass");
-		
+
 		/*Saludo Bienvenida*/
 		TextView mensajeBienvenida = (TextView) findViewById(R.id.textViewSaludo);
 		mensajeBienvenida.setText("Bienvenido "+this.user);
-		
-		
-		
+
 		/*Botones*/
-		
 		ImageView btnDescargar = (ImageView) findViewById(R.id.imageView1);
 		btnDescargar.setOnClickListener(new OnClickListener() {
 			public void onClick(View arg0) {
@@ -53,13 +50,11 @@ public class dashboard extends Activity {
 		
 		ImageView btnOpciones = (ImageView) findViewById(R.id.imageView3);
 		btnOpciones.setOnClickListener(new OnClickListener() {
-			public void onClick(View arg0) { //--clickOnListItem
-				/*Intent myIntent = new Intent(listaCasos.this, formulario1.class);
-				myIntent.putExtra("cod_ubicacion", listItem.getCod_ubicacion());
-				myIntent.putExtra("glosa_marca", listItem.getGlosa_marca());
-				myIntent.putExtra("glosa_modelo", listItem.getGlosa_modelo());
-				myIntent.putExtra("direccion", listItem.getDireccion());
-				startActivity(myIntent);*/
+			public void onClick(View arg0) {
+				Intent myIntent = new Intent(dashboard.this, settings.class);
+				myIntent.putExtra("user", user);
+				myIntent.putExtra("pass", pass);
+				startActivity(myIntent);
 			}
 		});
 		

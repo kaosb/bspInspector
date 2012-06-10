@@ -19,5 +19,6 @@
         <activity android:name=".sectionSelector"/>
         <activity android:name=".dashboard"/>
         <activity android:name=".getNuevosCasos"/>
+        <activity android:name=".settings"/>
     </application>
 </manifest>
