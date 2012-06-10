@@ -17,15 +17,16 @@ public final class R {
         public static final int btn_casos=0x7f020000;
         public static final int btn_descargar=0x7f020001;
         public static final int btn_entrar=0x7f020002;
-        public static final int btn_ocuenta=0x7f020003;
-        public static final int btn_opciones=0x7f020004;
-        public static final int btn_visitar=0x7f020005;
-        public static final int fail=0x7f020006;
-        public static final int greenball=0x7f020007;
-        public static final int ic_launcher=0x7f020008;
-        public static final int logo_big=0x7f020009;
-        public static final int logo_small=0x7f02000a;
-        public static final int ok=0x7f02000b;
+        public static final int btn_guardar=0x7f020003;
+        public static final int btn_ocuenta=0x7f020004;
+        public static final int btn_opciones=0x7f020005;
+        public static final int btn_visitar=0x7f020006;
+        public static final int fail=0x7f020007;
+        public static final int greenball=0x7f020008;
+        public static final int ic_launcher=0x7f020009;
+        public static final int logo_big=0x7f02000a;
+        public static final int logo_small=0x7f02000b;
+        public static final int ok=0x7f02000c;
     }
     public static final class id {
         public static final int LinearBotonera=0x7f060007;
@@ -89,6 +90,7 @@ public final class R {
         public static final int estado=0x7f040010;
         public static final int hello=0x7f040001;
         public static final int name=0x7f040004;
+        public static final int ncampos=0x7f040012;
         public static final int ncaso=0x7f04000f;
         public static final int ok=0x7f040003;
         public static final int pass=0x7f04000c;

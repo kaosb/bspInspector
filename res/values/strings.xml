@@ -18,4 +18,5 @@
     <string name="ncaso"> Nº DE CASO </string>
     <string name="estado"> ESTADO </string>
     <string name="direccion"> DIRECCIÓN </string>
+    <string name="ncampos"> NUMERO DE CAMPOS </string>
 </resources>
