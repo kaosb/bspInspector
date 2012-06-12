@@ -22,7 +22,7 @@ public class Downloader {
 		   try {
 		           File root = android.os.Environment.getExternalStorageDirectory();               
 
-		           File dir = new File (root.getAbsolutePath() + "/bspinspector");
+		           File dir = new File (root.getAbsolutePath() + "/bspinspector/conf");
 		           if(dir.exists()==false) {
 		                dir.mkdirs();
 		           }
@@ -71,7 +71,7 @@ public class Downloader {
 		
 		this.DownloadFromUrl("http://dl.dropbox.com/u/71778/bspinspector/versionState.txt", "versionState.json");
 		File root = android.os.Environment.getExternalStorageDirectory();
-        File versionfile = new File(root.getAbsolutePath() + "/bspinspector/" + "versionState.json");
+        File versionfile = new File(root.getAbsolutePath() + "/bspinspector/conf/" + "versionState.json");
         StringBuilder text = new StringBuilder();
         try {
         	
@@ -94,7 +94,7 @@ public class Downloader {
         this.DownloadFromUrl("http://dl.dropbox.com/u/71778/bspinspector/bspForm.sqlite", "bspForm.sqlite");
 
         File root = android.os.Environment.getExternalStorageDirectory();
-        File dbfile = new File(root.getAbsolutePath() + "/bspinspector/" + "bspForm.sqlite");
+        File dbfile = new File(root.getAbsolutePath() + "/bspinspector/conf/" + "bspForm.sqlite");
         
         if(dbfile.exists()){
         	return dbfile;

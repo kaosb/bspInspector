@@ -25,13 +25,16 @@ public class getNuevosCasos extends Activity {
 	
 	private static final String SOAP_ACTION = "urn:ServiciosBspAction";
 	private static final String URL = "http://w4.bsp.cl/ws_bsp/servicio/BspServices.php";
+	private String user;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.get_nuevos_casos);
+		
 		Bundle bundle = getIntent().getExtras();
-		String user = bundle.getString("user");
+		this.user = bundle.getString("user");
+		
 		int agregados = 0;
 		
 		/*Verifico la conexion*/
@@ -58,7 +61,7 @@ public class getNuevosCasos extends Activity {
 	        String envelopeRuta = "<soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">"
 	        				+"<soapenv:Header/>"
 	        				+"<soapenv:Body>"
-	        				+"<usr_inspector xsi:type=\"xsd:string\"><![CDATA[<carga><usr_inspector>"+user+"</usr_inspector></carga>]]></usr_inspector>"
+	        				+"<usr_inspector xsi:type=\"xsd:string\"><![CDATA[<carga><usr_inspector>"+this.user+"</usr_inspector></carga>]]></usr_inspector>"
 	        				+"</soapenv:Body>"
 	        				+"</soapenv:Envelope>";
 	        
@@ -211,7 +214,7 @@ public class getNuevosCasos extends Activity {
 	 * */
 	public File getdDBFile(){
         File root = android.os.Environment.getExternalStorageDirectory();
-        File dir = new File (root.getAbsolutePath() + "/bspinspector/");
+        File dir = new File (root.getAbsolutePath() + "/bspinspector/"+this.user+"/");
         
         if(dir.exists()==false) {
         	dir.mkdirs();

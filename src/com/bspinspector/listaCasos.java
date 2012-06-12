@@ -177,7 +177,7 @@ public class listaCasos extends Activity {
 					}
 					((TextView) view.findViewById(R.id.textViewnDirecciontxt)).setText(listItem.getDireccion());
 					view.setOnClickListener(new OnClickListener() {
-						public void onClick(View arg0) { //--clickOnListItem
+						public void onClick(View arg0) {
 							Intent myIntent = new Intent(listaCasos.this, sectionSelector.class);
 							myIntent.putExtra("user", user);
 							myIntent.putExtra("pass", pass);
@@ -252,7 +252,7 @@ public class listaCasos extends Activity {
 	 * */
 	public File getdDBFile(){
         File root = android.os.Environment.getExternalStorageDirectory();
-        File dir = new File (root.getAbsolutePath() + "/bspinspector/");
+        File dir = new File (root.getAbsolutePath() + "/bspinspector/"+this.user+"/");
         
         if(dir.exists()==false) {
         	dir.mkdirs();

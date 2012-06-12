@@ -59,7 +59,7 @@
 			    android:inputType="number" >
 			    <requestFocus />
 			</EditText>
-
+			
 			<ImageView
 			    android:id="@+id/imageView1"
 			    android:contentDescription="@string/app_name"

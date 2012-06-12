@@ -3,6 +3,7 @@ package com.bspinspector;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
@@ -46,7 +47,10 @@ public class login {
         }else{
         	db = createTableDB(dbfile);
         }
-        Date date = new Date();
+        
+        SimpleDateFormat s = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        String date = s.format(new Date());
+
         String[] args = new String[] {"0",user,pass};
     	Cursor c = db.query("tbl_login",
 				new String [] {"id", "user", "pass", "datecreate", "status"},
@@ -62,7 +66,7 @@ public class login {
     		newValues.put("datecreate", DateFormat.getDateTimeInstance().format(new Date()));
     		db.update("tbl_login", newValues, "id" + "=" + c.getString(0), null);
     	}else{
-    		db.execSQL("INSERT INTO tbl_login (user,pass,datecreate,status) VALUES ('"+user+"','"+pass+"','"+date.getDay()+"/"+date.getMonth()+"/"+date.getYear()+"','0') ");
+    		db.execSQL("INSERT INTO tbl_login (user,pass,datecreate,status) VALUES ('"+user+"','"+pass+"','"+date+"','0') ");
     	}
         db.close();
         c.close();

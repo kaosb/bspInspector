@@ -1,7 +1,15 @@
 package com.bspinspector;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -52,6 +60,98 @@ public class settings extends Activity {
         SharedPreferences.Editor editor = sp.edit();
         editor.putString("cantCampos", cantidad);
         editor.commit();
+        
+        /*DB*/
+        File dbfile = getdDBFile();
+        SQLiteDatabase db;
+        if(dbfile.exists()){
+        	db = SQLiteDatabase.openOrCreateDatabase(dbfile, null);
+        }else{
+        	db = createTableDB(dbfile);
+        }
+        
+        SimpleDateFormat s = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        String date = s.format(new Date());
+        
+        String[] args = new String[] {"0",user,"1"};
+    	Cursor c = db.query("tbl_settings",
+				new String [] {"id", "type", "value", "user", "datecreate", "status"},
+				"status = ? AND user = ? AND type = ?",
+				args,
+				null,
+				null,
+				null);
+    	
+    	if(c == null){
+            final String CREATE_TABLE_LOGIN = 
+            		"CREATE TABLE tbl_settings ("
+            				+ "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+            				+ "type TEXT,"
+            				+ "value TEXT,"
+            				+ "user TEXT,"
+            				+ "datecreate INTEGER,"
+            				+ "status INTEGER);";
+            db.execSQL(CREATE_TABLE_LOGIN);
+            
+            c = db.query("tbl_settings",
+    				new String [] {"id", "type", "value", "user", "datecreate", "status"},
+    				"status = ? AND user = ? AND type = ?",
+    				args,
+    				null,
+    				null,
+    				null);
+    	}
+    	
+    	if(c.moveToFirst()){
+       		ContentValues newValues = new ContentValues();
+    		newValues.put("value", cantidad);
+    		newValues.put("datecreate", date);
+    		db.update("tbl_settings", newValues, "id" + "=" + c.getString(0), null);
+    	}else{
+    		db.execSQL("INSERT INTO tbl_settings (type,value,user,datecreate,status) VALUES ('1','"+cantidad+"','"+user+"','"+date+"','0') ");
+    	}
+        db.close();
+        c.close();
+        
+        /*FIN DB*/
+        
     }
+    
+	/**
+	 * GET Archivo DB
+	 * */
+	public File getdDBFile(){
+        File root = android.os.Environment.getExternalStorageDirectory();
+        File dir = new File (root.getAbsolutePath() + "/bspinspector/conf/");
+        
+        if(dir.exists()==false) {
+        	dir.mkdirs();
+        }
+        File dbfile = new File(dir + "/BSP.sqlite");
+        return dbfile;
+	}
+	
+	/**
+	 * GET FILE DB
+	 * */
+	public SQLiteDatabase createTableDB(File dbfile){
+    	SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbfile, null);
+        Date date = new Date();
+        db.setVersion(date.getDate());
+        db.setLocale(Locale.getDefault());
+        db.setLockingEnabled(true);
+        
+        final String CREATE_TABLE_LOGIN = 
+        		"CREATE TABLE tbl_settings ("
+        				+ "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+        				+ "type TEXT,"
+        				+ "value TEXT,"
+        				+ "user TEXT,"
+        				+ "datecreate INTEGER,"
+        				+ "status INTEGER);";
+        db.execSQL(CREATE_TABLE_LOGIN);
+        
+        return db;
+	}
 	
 }
