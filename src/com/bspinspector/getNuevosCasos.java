@@ -1,6 +1,7 @@
 package com.bspinspector;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
@@ -9,6 +10,7 @@ import org.jsoup.nodes.Document;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -36,6 +38,7 @@ public class getNuevosCasos extends Activity {
 		this.user = bundle.getString("user");
 		
 		int agregados = 0;
+		int actualizados = 0;
 		
 		/*Verifico la conexion*/
 		if(connectionOK()){
@@ -79,7 +82,8 @@ public class getNuevosCasos extends Activity {
 	        	doc = Jsoup.parse(ruta.inspecciones[i]);
 		        
 		        /*Lo almaceno en una BD local*/
-		        Date date = new Date();
+	            SimpleDateFormat s = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+	            String date = s.format(new Date());
 		        String[] args = new String[] {doc.select("cod_ubicacion").text().trim()};
 		    	Cursor c = db.query("tbl_casos",
 						new String [] {"cod_ubicacion"},
@@ -92,11 +96,32 @@ public class getNuevosCasos extends Activity {
 		    	/*Recorrer BD*/
 		    	if(c.moveToFirst()){
 		    		/*Actualiza datos*/
-		       		/*ContentValues newValues = new ContentValues();
-		    		newValues.put("user",user);
-		    		newValues.put("pass", pass);
-		    		newValues.put("datecreate", DateFormat.getDateTimeInstance().format(new Date()));
-		    		db.update("tbl_login", newValues, "id" + "=" + c.getString(0), null);*/
+		       		ContentValues newValues = new ContentValues();
+		    		newValues.put("cod_ubicacion",doc.select("cod_ubicacion").text().trim());
+		    		newValues.put("cod_ramo", doc.select("cod_ramo").text().trim());
+		    		newValues.put("glosa_ramo", doc.select("glosa_ramo").text().trim());
+		    		newValues.put("cod_cia", doc.select("cod_cia").text().trim());
+		    		newValues.put("nom_asegurado", doc.select("nom_asegurado").text().trim());
+		    		newValues.put("nom_contacto", doc.select("nom_contacto").text().trim());
+		    		newValues.put("telefono", doc.select("telefono").text().trim());
+		    		newValues.put("direccion", doc.select("direccion").text().trim());
+		    		newValues.put("cod_comuna", doc.select("cod_comuna").text().trim());
+		    		newValues.put("glosa_comuna", doc.select("glosa_comuna").text().trim());
+		    		newValues.put("glosa_marca", doc.select("glosa_marca").text().trim());
+		    		newValues.put("glosa_modelo", doc.select("glosa_modelo").text().trim());
+		    		newValues.put("comentario", doc.select("comentario").text().trim());
+		    		newValues.put("patente", doc.select("patente").text().trim());
+		    		newValues.put("corredor", doc.select("corredor").text().trim());
+		    		newValues.put("observaciones", doc.select("observaciones").text().trim());
+		    		newValues.put("lleva_decla_datos_adic", doc.select("lleva_decla_datos_adic").text().trim());
+		    		newValues.put("lleva_propuesta", doc.select("lleva_propuesta").text().trim());
+		    		newValues.put("lleva_poliza", doc.select("lleva_poliza").text().trim());
+		    		newValues.put("fecha_visita", doc.select("fecha_visita").text().trim());
+		    		newValues.put("hora_visita", doc.select("hora_visita").text().trim());
+		    		newValues.put("datecreate", date);
+		    		newValues.put("status", "0");
+		    		db.update("tbl_casos", newValues, "cod_ubicacion" + "=" + c.getString(0), null);
+		    		actualizados++;
 		    	}else{
 		    		/*Inserta datos*/
 		    		db.execSQL("INSERT INTO tbl_casos ("
@@ -147,8 +172,7 @@ public class getNuevosCasos extends Activity {
 		    					        					+doc.select("lleva_poliza").text().trim()+"','"
 		    					        					+doc.select("fecha_visita").text().trim()+"','"
 		    					        					+doc.select("hora_visita").text().trim()+"','"
-		    					        					+date.getDay()+"/"+date.getMonth()+"/"+date.getYear()
-		    					        					+"','0') ");
+		    					        					+date+"','0') ");
 		    		agregados++;
 		    	}
 		    	/*Fin bucle cierro cursor*/
@@ -159,11 +183,19 @@ public class getNuevosCasos extends Activity {
 			
 		/*Instanciar elementos mensaje*/
 	        TextView mensaje = (TextView) findViewById(R.id.textView1);
+	        
 	        if(agregados>0){
-	        	mensaje.setText("Se cargaron " + agregados + " casos.");
+	        	mensaje.setText("Se cargaron " + agregados + " casos.\n");
 	        }else{
-	        	mensaje.setText("No hay casos nuevos.");
+	        	mensaje.setText("No hay casos nuevos.\n");
 	        }
+	        
+	        if(actualizados>0){
+	        	mensaje.setText(mensaje.getText()+"Se actualizaron " + actualizados + " casos.\n");
+	        }else{
+	        	mensaje.setText(mensaje.getText()+"No hay casos actualizados.\n");
+	        }
+	        
 	        Button ok = (Button) findViewById(R.id.button1);
 	        ok.setOnClickListener(new OnClickListener() {
 				public void onClick(View arg0) {

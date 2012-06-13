@@ -66,6 +66,15 @@ public class settings extends Activity {
         SQLiteDatabase db;
         if(dbfile.exists()){
         	db = SQLiteDatabase.openOrCreateDatabase(dbfile, null);
+            final String CREATE_TABLE_LOGIN = 
+            		"CREATE TABLE IF NOT EXISTS tbl_settings ("
+            				+ "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+            				+ "type TEXT,"
+            				+ "value TEXT,"
+            				+ "user TEXT,"
+            				+ "datecreate INTEGER,"
+            				+ "status INTEGER);";
+            db.execSQL(CREATE_TABLE_LOGIN);
         }else{
         	db = createTableDB(dbfile);
         }
@@ -81,26 +90,6 @@ public class settings extends Activity {
 				null,
 				null,
 				null);
-    	
-    	if(c == null){
-            final String CREATE_TABLE_LOGIN = 
-            		"CREATE TABLE tbl_settings ("
-            				+ "id INTEGER PRIMARY KEY AUTOINCREMENT,"
-            				+ "type TEXT,"
-            				+ "value TEXT,"
-            				+ "user TEXT,"
-            				+ "datecreate INTEGER,"
-            				+ "status INTEGER);";
-            db.execSQL(CREATE_TABLE_LOGIN);
-            
-            c = db.query("tbl_settings",
-    				new String [] {"id", "type", "value", "user", "datecreate", "status"},
-    				"status = ? AND user = ? AND type = ?",
-    				args,
-    				null,
-    				null,
-    				null);
-    	}
     	
     	if(c.moveToFirst()){
        		ContentValues newValues = new ContentValues();
@@ -142,7 +131,7 @@ public class settings extends Activity {
         db.setLockingEnabled(true);
         
         final String CREATE_TABLE_LOGIN = 
-        		"CREATE TABLE tbl_settings ("
+        		"CREATE TABLE IF NOT EXISTS tbl_settings ("
         				+ "id INTEGER PRIMARY KEY AUTOINCREMENT,"
         				+ "type TEXT,"
         				+ "value TEXT,"
