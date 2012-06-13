@@ -2,9 +2,6 @@ package com.bspinspector;
 
 import java.io.File;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.Activity;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -34,56 +31,17 @@ public class formMaker extends Activity {
 	String[][] Llaves;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-        /*instancia Textview para pruebas*/
-        TextView textTest = (TextView) findViewById(R.id.txtTest);
-        
-        /*Instancia el DownloadHelper*/
         Downloader dw = new Downloader();
-        
-        JSONObject jsonVersion;
-		try {
-			jsonVersion = new JSONObject(dw.getVersion());
-			textTest.setText(jsonVersion.getJSONObject("version").getString("versionCode")+"/"+jsonVersion.getJSONObject("version").getString("codeName")+"/");
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-        /*Abrir la bd*/
-		/**
-		 * getBD() es solo para descargar la BD en consecuencia es necesario verificar y contrastar la version antes ya que si no corresponde no deberiamos llamar siempre a getBD.
-		 * */
         File dbfile = dw.getDB();
         if(dbfile.exists()){
-        	
         	SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbfile, null);
-        	
-            String result = null;
-            
-            if(db.isOpen()){
-            	result = "BD Open OK";
-            }else{
-            	result = "BD NO Open";
-            }
-            
-            textTest.setText(textTest.getText()+"/"+result);
-            Log.i("DB open? ",result);
-            
-            
-            
-            
-            
-            
-
-            
-            /*Trabajar con la BD*/
+            //Trabajar con la BD
             	Bundle bundle = getIntent().getExtras();
             	String[] args = new String[] {"0",bundle.getString("sectionId")};
-            	//Cursor c = db.rawQuery("SELECT * FROM input WHERE status=? and type=?",args);
             	Cursor c = db.query("input",
             						new String [] {"id", "section", "name", "type", "dep", "status"},
             						"status = ? AND section = ?",
@@ -122,7 +80,7 @@ public class formMaker extends Activity {
             /*Fin crear vista*/
             
 	            //Nos aseguramos de que existe al menos un registro
-	            if (c.moveToFirst()) {
+	            if (c.moveToFirst()){
 	                 //Recorremos el cursor hasta que no haya más registros
 	                 do {
 	                	 Log.i("Pregunta", c.getString(2));
@@ -138,7 +96,6 @@ public class formMaker extends Activity {
 	                	 TextView tv = new TextView(this);
 	                	 tv.setTextSize(14);
 	                	 tv.setTextColor(Color.parseColor("#080A1D"));
-	                	 //tv.setText("/"+c.getString(0)+"/"+c.getString(1)+"/"+c.getString(2)+"/"+c.getString(3)+"/"+c.getString(4)+"/"+c.getString(5));
 	                	 cont.addView(tv);
 	                	 
 	                	 Llaves[indice][0] = c.getString(0);
@@ -195,15 +152,13 @@ public class formMaker extends Activity {
 	                		    for(int i=0; i<3; i++){
 	                		        rb[i]  = new RadioButton(this);
 	                		        rb[i].setId(Integer.parseInt(c.getString(0))*100);
-	                		        rbg.addView(rb[i]); //the RadioButtons are added to the radioGroup instead of the layout
+	                		        rbg.addView(rb[i]);
 	                		        rb[i].setText("Test "+i);
 	                		        rb[i].setTextSize(14);
 	                		        rb[i].setTextColor(Color.parseColor("#080A1D"));
 	                		    }
 
 	                		 cont.addView(rbg);
-	                		 //rg.check(R.id.radio1);
-	                		 //int idSeleccionado = rg.getCheckedRadioButtonId();
 	                		 
 	                		 break;
 	                	 case 5:
@@ -315,7 +270,6 @@ public class formMaker extends Activity {
              				
              			case 4:
              				RadioGroup rbg = (RadioGroup) findViewById(Integer.parseInt(Llaves[i][0]));
-             				//RadioButton rb = (RadioButton) findViewById(rbg.getCheckedRadioButtonId());
              				prueba= prueba+"/"+rbg.getCheckedRadioButtonId()/100;
              				break;
 
@@ -328,15 +282,9 @@ public class formMaker extends Activity {
              				}
              				break;
              			}
-   	                	 
-   	                	 
-   	                	 
    	                 }
    	                 
-
             		Toast.makeText(formMaker.this, ""+prueba, Toast.LENGTH_SHORT).show();
-            		
-            		//finish();
             	}
             });
             
@@ -364,18 +312,7 @@ public class formMaker extends Activity {
             ll.addView(pie);
             
             this.setContentView(sv);
-            
 
-            
-            
-            
-            
-            
-            
-        }else{
-        	textTest.setText("El archivo no existe");
         }
-		
-		
 	}
 }
