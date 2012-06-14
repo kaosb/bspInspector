@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 public class formMaker extends Activity {
 	
+	int maxpp = 0;
 	int marcador = 0;
 	String[][] Llaves;
 
@@ -37,6 +38,12 @@ public class formMaker extends Activity {
 
         Downloader dw = new Downloader();
         File dbfile = dw.getDB();
+        
+        File dbConfFile = getdDBFile();
+        if(dbConfFile.exists()){
+        	SQLiteDatabase dbConf = SQLiteDatabase.openOrCreateDatabase(dbConfFile, null);
+        }
+        
         if(dbfile.exists()){
         	SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbfile, null);
             //Trabajar con la BD
@@ -314,5 +321,19 @@ public class formMaker extends Activity {
             this.setContentView(sv);
 
         }
+	}
+	
+	/**
+	 * GET Archivo DB
+	 * */
+	public File getdDBFile(){
+        File root = android.os.Environment.getExternalStorageDirectory();
+        File dir = new File (root.getAbsolutePath() + "/bspinspector/conf/");
+        
+        if(dir.exists()==false) {
+        	dir.mkdirs();
+        }
+        File dbfile = new File(dir + "/BSP.sqlite");
+        return dbfile;
 	}
 }
