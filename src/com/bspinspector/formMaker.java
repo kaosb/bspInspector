@@ -41,7 +41,7 @@ public class formMaker extends Activity {
         
         File dbConfFile = getdDBFile();
         if(dbConfFile.exists()){
-        	SQLiteDatabase dbConf = SQLiteDatabase.openOrCreateDatabase(dbConfFile, null);
+        	//SQLiteDatabase dbConf = SQLiteDatabase.openOrCreateDatabase(dbConfFile, null);
         }
         
         if(dbfile.exists()){
