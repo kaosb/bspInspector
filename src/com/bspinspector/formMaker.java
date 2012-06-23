@@ -35,19 +35,35 @@ public class formMaker extends Activity {
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		Bundle bundle = getIntent().getExtras();
 
+		// Descargamos la BD con el form si es distinta a la version que tenemos.
         Downloader dw = new Downloader();
         File dbfile = dw.getDB();
         
+        //Consulta que obtiene los settings
         File dbConfFile = getdDBFile();
         if(dbConfFile.exists()){
-        	//SQLiteDatabase dbConf = SQLiteDatabase.openOrCreateDatabase(dbConfFile, null);
+        	SQLiteDatabase dbConf = SQLiteDatabase.openOrCreateDatabase(dbConfFile, null);
+        	//Obtener conf de la BD
+        		String[] argConf = new String[] {"0",bundle.getString("user")};
+            	Cursor b = dbConf.query("tbl_settings",
+						new String [] {"type", "value"},
+						"status = ? AND user = ?",
+						argConf,
+						null,
+						null,
+						null);
+	        if(b.moveToFirst()){
+	        	// La configuracion guardada
+	        	Log.i("Cantidad conf", b.getString(1));
+	        }
         }
         
+        // Si tenemos la bd maestra para los forms entramos a consultarla
         if(dbfile.exists()){
         	SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbfile, null);
             //Trabajar con la BD
-            	Bundle bundle = getIntent().getExtras();
             	String[] args = new String[] {"0",bundle.getString("sectionId")};
             	Cursor c = db.query("input",
             						new String [] {"id", "section", "name", "type", "dep", "status"},
@@ -59,7 +75,7 @@ public class formMaker extends Activity {
             	
             /*Crear Vista*/
             
-            	Toast.makeText(formMaker.this, ""+c.getCount()+" items", Toast.LENGTH_SHORT).show();
+            	//Toast.makeText(formMaker.this, ""+c.getCount()+" items", Toast.LENGTH_SHORT).show();
             	Llaves = new String[c.getCount()][2];
             	int indice = 0;
             	
