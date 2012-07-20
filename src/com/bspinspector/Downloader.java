@@ -77,6 +77,7 @@ public class Downloader {
         	
 			BufferedReader br = new BufferedReader(new FileReader(versionfile));
 			text.append(br.readLine());
+			br.close();
 			return text.toString();
 			
 		} catch (FileNotFoundException e) {
