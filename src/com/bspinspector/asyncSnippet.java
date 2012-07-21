@@ -14,7 +14,7 @@ public class asyncSnippet extends Activity {
 		super.onCreate(savedInstanceState);
 
 		/*Lanzamos mensaje y tarea async*/
-	    this.pd = ProgressDialog.show(this, "", "Cargando datos..", true, false);
+	    this.pd = ProgressDialog.show(this, "", "Cargando...", true, false);
         new DownloadTask().execute("");
 		
 	}

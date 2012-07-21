@@ -2,6 +2,7 @@ package com.bspinspector;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -23,6 +25,12 @@ public class dologin extends Activity {
 	private static final String SOAP_ACTION = "urn:ServiciosBspAction";
 	private static final String URL = "http://w4.bsp.cl/ws_bsp/servicio/BspServices.php";
 	private TextView isonline;
+	private login login;
+	private EditText txtUser;
+	private EditText txtPass;
+	private LinearLayout PanelMensaje;
+	private CheckBox cbRemember;
+	private ProgressDialog pd = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -30,13 +38,13 @@ public class dologin extends Activity {
         setContentView(R.layout.dologin);
         
         /*Respuesta*/
-        final LinearLayout PanelMensaje = (LinearLayout) findViewById(R.id.LinearLayoutMensaje);
+        PanelMensaje = (LinearLayout) findViewById(R.id.LinearLayoutMensaje);
         isonline = (TextView) findViewById(R.id.textViewOnline);
         
         /*Campos*/
-        final EditText txtUser = (EditText) findViewById(R.id.editText1);
-        final EditText txtPass = (EditText) findViewById(R.id.editText2);
-        final CheckBox cbRemember = (CheckBox)findViewById(R.id.checkBoxRecordar);
+        txtUser = (EditText) findViewById(R.id.editText1);
+        txtPass = (EditText) findViewById(R.id.editText2);
+        cbRemember = (CheckBox)findViewById(R.id.checkBoxRecordar);
         
         /*Button Aceptar*/
         final ImageView btnEntrar = (ImageView) findViewById(R.id.imageViewBtnEntrar);
@@ -51,59 +59,81 @@ public class dologin extends Activity {
                  * */
             	// ronald.arias y bsp2008
             		alertOnline();
-	                login login = new login(URL,SOAP_ACTION,txtUser.getText().toString(),txtPass.getText().toString(),connectionOK());
-	                if(login.getCodigo().equals("SI")){
-	                	PanelMensaje.removeAllViewsInLayout();
-	                	ImageView icono = new ImageView(dologin.this);
-	                	icono.setImageResource(R.drawable.ok);
-	                	TextView mensaje = new TextView(dologin.this);
-	                	mensaje.setTextColor(Color.parseColor("#00FF00"));
-	                	mensaje.setText("Login correcto.");
-	                	mensaje.setPadding(5, 0, 0, 0);
-	                	PanelMensaje.addView(icono);
-	                	PanelMensaje.addView(mensaje);
-	                	
-	                	String rememberString;
-	                	if(cbRemember.isChecked()){
-	                		rememberString = "true";
-	                	}else{
-	                		rememberString = "false";
-	                	}
-	
-	                	rememberMe(txtUser.getText().toString(),txtPass.getText().toString(),rememberString);           
-	                    
-	                	Intent i = new Intent(dologin.this, dashboard.class);
-	                    i.putExtra("user", txtUser.getText().toString());
-	                    i.putExtra("pass", txtPass.getText().toString());
-	                    
-	                	if(connectionOK()){
-	                		Log.i("INTERNET", "conectado");
-	                	    /*this.pd = ProgressDialog.show(this, "", "Cargando datos..", true, false);
-	                        new DownloadTask().execute("");*/
-	                		startActivity(i);
-	                	}else{
-	                    	Log.i("INTERNET", "no conectado");
-	                    	mensajeCON();
-	                	}
-	                    
-	                	
-	                }else{
-	                	PanelMensaje.removeAllViewsInLayout();
-	                	ImageView icono = new ImageView(dologin.this);
-	                	icono.setImageResource(R.drawable.fail);
-	                	TextView mensaje = new TextView(dologin.this);
-	                	mensaje.setTextColor(Color.parseColor("#FF0000"));
-	                	mensaje.setText("Login incorrecto.");
-	                	mensaje.setPadding(5, 0, 0, 0);
-	                	PanelMensaje.addView(icono);
-	                	PanelMensaje.addView(mensaje);
-	                	Log.i("LOGIN", login.getCodigo());
-	                	Log.i("LOGIN", login.getGlosa());
-	                }
-            	}
+            	    dologin.this.pd = ProgressDialog.show(dologin.this, "", "Cargando...", true, false);
+                    new DownloadTask().execute("");
+	                
+            }
         });
         
 	}
+	
+	
+	/**
+	 * Clase AsyncTask
+	 * */
+	private class DownloadTask extends AsyncTask<String, Void, Object> {
+        protected Object doInBackground(String... args) {
+        	login = new login(URL,SOAP_ACTION,txtUser.getText().toString(),txtPass.getText().toString(),connectionOK());
+			return null;
+        	// Ejecucion
+        }
+
+        protected void onPostExecute(Object result) {
+        	// Pos ejecucion
+        	dologin.this.pd.dismiss();
+        	if(login.getCodigo().equals("SI")){
+            	PanelMensaje.removeAllViewsInLayout();
+            	ImageView icono = new ImageView(dologin.this);
+            	icono.setImageResource(R.drawable.ok);
+            	TextView mensaje = new TextView(dologin.this);
+            	mensaje.setTextColor(Color.parseColor("#00FF00"));
+            	mensaje.setText("Login correcto.");
+            	mensaje.setPadding(5, 0, 0, 0);
+            	PanelMensaje.addView(icono);
+            	PanelMensaje.addView(mensaje);
+            	
+            	String rememberString;
+            	if(cbRemember.isChecked()){
+            		rememberString = "true";
+            	}else{
+            		rememberString = "false";
+            	}
+
+            	rememberMe(txtUser.getText().toString(),txtPass.getText().toString(),rememberString);           
+                
+            	Intent i = new Intent(dologin.this, dashboard.class);
+                i.putExtra("user", txtUser.getText().toString());
+                i.putExtra("pass", txtPass.getText().toString());
+                
+            	if(connectionOK()){
+            		Log.i("INTERNET", "conectado");
+            	    /*this.pd = ProgressDialog.show(this, "", "Cargando datos..", true, false);
+                    new DownloadTask().execute("");*/
+            		startActivity(i);
+            	}else{
+                	Log.i("INTERNET", "no conectado");
+                	mensajeCON();
+            	}
+                
+            	
+            }else{
+            	PanelMensaje.removeAllViewsInLayout();
+            	ImageView icono = new ImageView(dologin.this);
+            	icono.setImageResource(R.drawable.fail);
+            	TextView mensaje = new TextView(dologin.this);
+            	mensaje.setTextColor(Color.parseColor("#FF0000"));
+            	mensaje.setText("Login incorrecto.");
+            	mensaje.setPadding(5, 0, 0, 0);
+            	PanelMensaje.addView(icono);
+            	PanelMensaje.addView(mensaje);
+            	Log.i("LOGIN", login.getCodigo());
+            	Log.i("LOGIN", login.getGlosa());
+            }
+        }
+	} 
+	/**
+	 * fin clase AsyncTask
+	 * */
 	
 	
 	/**

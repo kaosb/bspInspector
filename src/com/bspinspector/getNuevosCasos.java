@@ -10,12 +10,14 @@ import org.jsoup.nodes.Document;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -28,6 +30,10 @@ public class getNuevosCasos extends Activity {
 	private static final String SOAP_ACTION = "urn:ServiciosBspAction";
 	private static final String URL = "http://w4.bsp.cl/ws_bsp/servicio/BspServices.php";
 	private String user;
+	int agregados = 0;
+	int actualizados = 0;
+	private ProgressDialog pd = null;
+	TextView mensaje;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -36,13 +42,33 @@ public class getNuevosCasos extends Activity {
 		
 		Bundle bundle = getIntent().getExtras();
 		this.user = bundle.getString("user");
-		
-		int agregados = 0;
-		int actualizados = 0;
-		
+
 		/*Verifico la conexion*/
 		if(connectionOK()){
+		    this.pd = ProgressDialog.show(this, "", "Cargando...", true, false);
+	        new DownloadTask().execute("");
 			
+	        Button ok = (Button) findViewById(R.id.button1);
+	        ok.setOnClickListener(new OnClickListener() {
+				public void onClick(View arg0) {
+					finish();
+				}
+			});
+			
+		}else{
+			/*Alerta sin conexion*/
+			mensajeCON();
+		}
+		
+	}
+	
+	
+	/**
+	 * Clase AsyncTask
+	 * */
+	private class DownloadTask extends AsyncTask<String, Void, Object> {
+        protected Object doInBackground(String... args) {
+        	
 			/*Verificar Archivo*/
 	        File dbfile = getdDBFile();
 	        SQLiteDatabase db;
@@ -64,7 +90,7 @@ public class getNuevosCasos extends Activity {
 	        String envelopeRuta = "<soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">"
 	        				+"<soapenv:Header/>"
 	        				+"<soapenv:Body>"
-	        				+"<usr_inspector xsi:type=\"xsd:string\"><![CDATA[<carga><usr_inspector>"+this.user+"</usr_inspector></carga>]]></usr_inspector>"
+	        				+"<usr_inspector xsi:type=\"xsd:string\"><![CDATA[<carga><usr_inspector>"+user+"</usr_inspector></carga>]]></usr_inspector>"
 	        				+"</soapenv:Body>"
 	        				+"</soapenv:Envelope>";
 	        
@@ -84,11 +110,11 @@ public class getNuevosCasos extends Activity {
 		        /*Lo almaceno en una BD local*/
 	            SimpleDateFormat s = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 	            String date = s.format(new Date());
-		        String[] args = new String[] {doc.select("cod_ubicacion").text().trim()};
+	            String[] argumentos = new String[] {doc.select("cod_ubicacion").text().trim()};
 		    	Cursor c = db.query("tbl_casos",
 						new String [] {"cod_ubicacion"},
 						"cod_ubicacion = ?",
-						args,
+						argumentos,
 						null,
 						null,
 						null);
@@ -180,9 +206,13 @@ public class getNuevosCasos extends Activity {
 	        }
 	    	/*Cerrar conexion y cursor*/
 	        db.close();
-			
-		/*Instanciar elementos mensaje*/
-	        TextView mensaje = (TextView) findViewById(R.id.textView1);
+        	
+			return null;
+        }
+
+        protected void onPostExecute(Object result) {
+    		/*Instanciar elementos mensaje*/
+	        mensaje = (TextView) findViewById(R.id.textView1);
 	        
 	        if(agregados>0){
 	        	mensaje.setText("Se cargaron " + agregados + " casos.\n");
@@ -195,20 +225,13 @@ public class getNuevosCasos extends Activity {
 	        }else{
 	        	mensaje.setText(mensaje.getText()+"No hay casos actualizados.\n");
 	        }
-	        
-	        Button ok = (Button) findViewById(R.id.button1);
-	        ok.setOnClickListener(new OnClickListener() {
-				public void onClick(View arg0) {
-					finish();
-				}
-			});
-			
-		}else{
-			/*Alerta sin conexion*/
-			mensajeCON();
-		}
-		
-	}
+        	getNuevosCasos.this.pd.dismiss();
+        }
+	} 
+	/**
+	 * fin clase AsyncTask
+	 * */
+	
     
 	/**
 	 * Verifica Conexion

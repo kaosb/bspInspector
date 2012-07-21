@@ -43,7 +43,8 @@ public class login {
         File dbfile = getdDBFile();
         SQLiteDatabase db;
         if(dbfile.exists()){
-        	db = SQLiteDatabase.openOrCreateDatabase(dbfile, null);
+        	//db = SQLiteDatabase.openOrCreateDatabase(dbfile, null);
+        	db = createTableDB(dbfile);
         }else{
         	db = createTableDB(dbfile);
         }
@@ -207,7 +208,7 @@ public class login {
         db.setLockingEnabled(true);
         
         final String CREATE_TABLE_LOGIN = 
-        		"CREATE TABLE tbl_login ("
+        		"CREATE TABLE IF NOT EXISTS tbl_login ("
         				+ "id INTEGER PRIMARY KEY AUTOINCREMENT,"
         				+ "user TEXT,"
         				+ "pass TEXT,"

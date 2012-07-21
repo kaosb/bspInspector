@@ -2,6 +2,7 @@ package com.bspinspector;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
@@ -33,6 +34,7 @@ public class formMaker extends Activity {
 	
 	private String user;
 	private String cod_ubicacion;
+	private String sectionId;
 	/**
 	 * Elementos necesarios para generar la vista.
 	 * */
@@ -59,6 +61,9 @@ public class formMaker extends Activity {
 		bundle = getIntent().getExtras();
 		this.user = bundle.getString("user");
 		this.cod_ubicacion = bundle.getString("cod_ubicacion");
+		this.sectionId = bundle.getString("sectionId");
+		
+		Log.i("SESION", this.user+"/"+this.cod_ubicacion);
 
 		// Descargamos la BD con el form si es distinta a la version que tenemos.
         Downloader dw = new Downloader();
@@ -69,7 +74,7 @@ public class formMaker extends Activity {
         if(dbConfFile.exists()){
         	SQLiteDatabase dbConf = SQLiteDatabase.openOrCreateDatabase(dbConfFile, null);
         	//Obtener conf de la BD
-        		String[] argConf = new String[] {"0",bundle.getString("user")};
+        		String[] argConf = new String[] {"0",this.user};
             	Cursor b = dbConf.query("tbl_settings",
 						new String [] {"type", "value"},
 						"status = ? AND user = ?",
@@ -92,7 +97,8 @@ public class formMaker extends Activity {
         	
         	SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbfile, null);
             //Trabajar con la BD
-            	String[] args = new String[] {"0",bundle.getString("sectionId")};
+        		Log.i("seccion", this.sectionId);
+            	String[] args = new String[] {"0",this.sectionId};
             	Cursor c = db.query("input",
             						new String [] {"id", "section", "name", "type", "dep", "status"},
             						"status = ? AND section = ?",
@@ -114,7 +120,7 @@ public class formMaker extends Activity {
 	            cabecera.setGravity(Gravity.CENTER);
 	            
 	            TextView tituloCabecera = new TextView(this);
-	            tituloCabecera.setText("Secci√≥n "+bundle.getString("sectionId"));
+	            tituloCabecera.setText("Sección "+this.sectionId);
 	            tituloCabecera.setTextSize(18);
 	            tituloCabecera.setTextColor(Color.parseColor("#FFFFFF"));
 	            tituloCabecera.setTypeface(null, Typeface.BOLD);
@@ -154,8 +160,7 @@ public class formMaker extends Activity {
             		      
             		      TextView txtTemp = (TextView) lltemp.getChildAt(0);
             		      String label = (String) txtTemp.getText();
-            		    		  
-
+            		      
             		      switch(type){
               			
 	               			case 1:
@@ -168,31 +173,30 @@ public class formMaker extends Activity {
 	               				Spinner spinner = (Spinner) findViewById(Integer.parseInt(id));
 	               				Data= Data+label+": "+spinner.getSelectedItem()+"\n";
 	               				saveFieldValue(Integer.parseInt(id),spinner.getSelectedItem().toString());
-	               				//saveFieldValue(Integer.parseInt(id),""+spinner.getSelectedItemPosition());
 	               				break;
 	               				
 	               			case 3:
 	               				CheckBox checkbox = (CheckBox) findViewById(Integer.parseInt(id));
 	               				if(checkbox.isChecked()){
 	               					Data= Data+label+": "+checkbox.getId()+"\n";
-	               					saveFieldValue(Integer.parseInt(id),"chek".toString());
+	               					//saveFieldValue(Integer.parseInt(id),"chek".toString());
 	               				}
 	               				break;
 	               				
 	               			case 4:
 	               				RadioGroup rbg = (RadioGroup) findViewById(Integer.parseInt(id));
 	               				Data= Data+label+": "+rbg.getCheckedRadioButtonId()/100+"\n";
-	               				saveFieldValue(Integer.parseInt(id),"");
+	               				//saveFieldValue(Integer.parseInt(id),"");
 	               				break;
 	
 	               			default:
 	               				EditText redtd = (EditText) findViewById(Integer.parseInt(id));
 	               				try{
 	               					Data= Data+"\n"+label+": "+redtd.getText();
-	               					saveFieldValue(Integer.parseInt(id),redtd.getText().toString());
+	               					//saveFieldValue(Integer.parseInt(id),redtd.getText().toString());
 	               				}catch(Exception e){
 	               					Data= Data+label+": "+"cuack"+"\n";
-	               					saveFieldValue(Integer.parseInt(id),"cuack");
+	               					//saveFieldValue(Integer.parseInt(id),"cuack");
 	               				}
 	               				break;
             		      }
@@ -202,7 +206,7 @@ public class formMaker extends Activity {
             		Toast.makeText(formMaker.this, "Se acaban de guardar en tu equipo los siguientes datos:\n"+Data, Toast.LENGTH_SHORT).show();
     	        	SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbfile, null);
     	            //Trabajar con la BD
-    	            	String[] args = new String[] {"0",bundle.getString("sectionId")};
+    	            	String[] args = new String[] {"0", sectionId};
     	            	Cursor c = db.query("input",
     	            						new String [] {"id", "section", "name", "type", "dep", "status"},
     	            						"status = ? AND section = ?",
@@ -287,6 +291,8 @@ public class formMaker extends Activity {
             	 tv.setTextColor(Color.parseColor("#080A1D"));
             	 cont.addView(tv);
             	 
+            	 String value;
+            	 
             	 /*Campo*/
             	 switch(Integer.parseInt(c.getString(3))){
             	 
@@ -298,7 +304,7 @@ public class formMaker extends Activity {
             		 edt.setTag(1);
             		 edt.setInputType(InputType.TYPE_CLASS_TEXT);
             		 cont.addView(edt);
-            		 String value = getFieldValue(c.getInt(0));
+            		 value = getFieldValue(c.getInt(0));
             		 if(value != null){
             			 edt.setText(value.toString());
             		 }
@@ -309,9 +315,9 @@ public class formMaker extends Activity {
             		 		// Mantiene el contador sobre la cantidad de opciones de cada select ya sea para los casos especiales o los genericos.
             		 		Cursor countOptions;
             		 		// Mantiene las opciones que seran entragadas al spinner
-            		 		Cursor options;
+            		 		Cursor options = null;
             		 		// Contador auxiliar que se usa en los bucles para paginar segun lo configurado.
-            		 		int count;
+            		 		int count = 0;
             		 		
             		 		switch(c.getInt(0)){
             		 		case 3:
@@ -336,17 +342,18 @@ public class formMaker extends Activity {
             		 			//Consulto BD Con options
             		 			// Contamos la cantidad de opciones que posee el input
             		 			countOptions = db.rawQuery("SELECT COUNT(*) FROM option WHERE status = 0 AND input = "+c.getString(0), null);
-            		 			countOptions.moveToFirst();
-            		 			count= countOptions.getInt(0);
-            		 			// Consultamos las opciones asociadas al input
-            		 			String[] args1 = new String[] {"0",c.getString(0)};
-            		 			options = db.query("option",
-            		 					new String [] {"name"},
-            		 					"status = ? AND input = ?",
-            		 					args1,
-            		 					null,
-            		 					null,
-            		 					null);
+            		 			if(countOptions.moveToFirst()){
+	            		 			count= countOptions.getInt(0);
+	            		 			// Consultamos las opciones asociadas al input
+	            		 			String[] args1 = new String[] {"0",c.getString(0)};
+	            		 			options = db.query("option",
+	            		 					new String [] {"name"},
+	            		 					"status = ? AND input = ?",
+	            		 					args1,
+	            		 					null,
+	            		 					null,
+	            		 					null);
+            		 			}
             		 			break;
             		 		}
 		            		
@@ -381,6 +388,13 @@ public class formMaker extends Activity {
 		                	ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, items);
 		                	adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		                	spinner.setAdapter(adapter);
+		                	
+		                	//Get saved value
+		                	value = getFieldValue(c.getInt(0));
+		                	if(value != null){
+		                		int pos = Arrays.binarySearch(items, value);
+		                		spinner.setSelection(pos);
+		                	}
 		                	
 		                	// Lo agrego a la vista
 		                	cont.addView(spinner);
@@ -426,6 +440,10 @@ public class formMaker extends Activity {
             		 edtn.setTag(5);
             		 edtn.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
             		 cont.addView(edtn);
+            		 value = getFieldValue(c.getInt(0));
+            		 if(value != null){
+            			 edtn.setText(value.toString());
+            		 }
             		 
             		 break;
             	 case 6:
@@ -436,6 +454,10 @@ public class formMaker extends Activity {
             		 edtm.setTag(6);
             		 edtm.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
             		 cont.addView(edtm);
+            		 value = getFieldValue(c.getInt(0));
+            		 if(value != null){
+            			 edtm.setText(value.toString());
+            		 }
             		 
             		 break;
             	 case 7:
@@ -446,6 +468,10 @@ public class formMaker extends Activity {
             		 edtr.setId(Integer.parseInt(c.getString(0)));
             		 edtr.setInputType(InputType.TYPE_CLASS_TEXT);
             		 cont.addView(edtr);
+            		 value = getFieldValue(c.getInt(0));
+            		 if(value != null){
+            			 edtr .setText(value.toString());
+            		 }
             		 
             		 break;
             	 case 8:
@@ -488,7 +514,8 @@ public class formMaker extends Activity {
             	 Log.i("item", item+"<"+itemspp+"-->"+c.getPosition()+" de "+c.getCount());
              }while(c.moveToNext() && item < itemspp);
              //Mantiene el index y posicion
-             itemcount = c.getPosition();        
+             itemcount = c.getPosition();
+             Log.i("Index cursor:", ""+itemcount);
         }else{
         	finish();
         }
@@ -509,12 +536,19 @@ public class formMaker extends Activity {
         	dbTarget = createTableDB(dbfileSaveData);
         }
         Cursor count = dbTarget.rawQuery("SELECT value FROM dataInProgress WHERE idInput =" + fieldID+" AND idCase="+cod_ubicacion, null);
-		count.moveToFirst();
-        Log.i("return->",count.getString(0));
-        dbTarget.close();
-        String valor = count.getString(0);
-        count.close();
-        return valor;
+		
+        if(count.moveToFirst()){
+			Log.i("return->",count.getString(0));
+			String valor = count.getString(0);
+			count.close();
+			dbTarget.close();
+			return valor;
+		}else{
+			count.close();
+			dbTarget.close();
+			return null;
+		}
+        
 	}
 	/**
 	 * Funcion para guardar el valor de un campo de formulario

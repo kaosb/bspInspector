@@ -123,7 +123,6 @@ public class listaCasos extends Activity {
 	 * */
 	public void onClick(View v) {
 	}
-
 	/**
 	 * ListAdapter
 	 * */
@@ -195,8 +194,6 @@ public class listaCasos extends Activity {
 			return view;
 		}
 	}
-	
-	
     /**
      * Alerta Online Offline
      * */
@@ -211,7 +208,6 @@ public class listaCasos extends Activity {
         	isonline.setTextColor(Color.parseColor("#FF0000"));
         }
     }
-    
 	/**
 	 * Verifica Conexion
 	 * */
@@ -226,7 +222,6 @@ public class listaCasos extends Activity {
 			return false;
 		}
 	}
-
 	/**
 	 * Genera Mensaje sin BD cargar
 	 * */
@@ -246,7 +241,6 @@ public class listaCasos extends Activity {
 		alertDialog.setIcon(R.drawable.fail);
 		alertDialog.show();
 	}
-	
 	/**
 	 * GET Archivo DB
 	 * */
