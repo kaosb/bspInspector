@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,6 +15,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,6 +33,11 @@ public class listaCasos extends Activity {
 	private TextView isonline;
 	private ListView listview;
 	private ArrayList<caso> mListItem;
+	private ProgressDialog pd = null;
+	private SQLiteDatabase db;
+	private File dbfile;
+	private ArrayList<caso> list;
+	private caso caso;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -38,8 +45,7 @@ public class listaCasos extends Activity {
 		setContentView(R.layout.list_casos);
 		
 		listview = (ListView) findViewById(R.id.list_view);
-        ArrayList<caso> list = new ArrayList<caso>();
-        caso caso;
+        list = new ArrayList<caso>();
 
 		/*Get DATA*/
 		Bundle bundle = getIntent().getExtras();
@@ -55,10 +61,24 @@ public class listaCasos extends Activity {
 
 			
 		/*Verificar Archivo*/
-		File dbfile = getdDBFile();
+		dbfile = getdDBFile();
 		
 		if(dbfile.exists()){
-			SQLiteDatabase db;
+		    this.pd = ProgressDialog.show(this, "", "Cargando...", true, false);
+	        new DownloadTask().execute("");
+		}else{
+			mensajeBD();
+		}
+		
+	}
+	
+	
+	/**
+	 * Clase AsyncTask
+	 * */
+	private class DownloadTask extends AsyncTask<String, Void, Object> {
+        protected Object doInBackground(String... args) {
+        	
 			db = SQLiteDatabase.openOrCreateDatabase(dbfile, null);
 			
 	    	Cursor c = db.query("tbl_casos",
@@ -105,17 +125,22 @@ public class listaCasos extends Activity {
 			        list.add(caso);
 		        }while(c.moveToNext());
 	    	}
-			
-			mListItem = list;
-			listview.setAdapter(new ListAdapter(listaCasos.this, R.id.list_view, mListItem));
+	    	
 			c.close();
 			db.close();
-			
-		}else{
-			mensajeBD();
-		}
-		
-	}
+        	
+			return null;
+        }
+
+        protected void onPostExecute(Object result) {
+			mListItem = list;
+			listview.setAdapter(new ListAdapter(listaCasos.this, R.id.list_view, mListItem));
+        	listaCasos.this.pd.dismiss();
+        }
+	} 
+	/**
+	 * fin clase AsyncTask
+	 * */
 	
 	
 	/**
