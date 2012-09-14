@@ -200,6 +200,19 @@ public class listaCasos extends Activity {
 						break;
 					}
 					((TextView) view.findViewById(R.id.textViewnDirecciontxt)).setText(listItem.getDireccion());
+					
+					/*Otros campos agregados*/
+					((TextView) view.findViewById(R.id.textViewncasotxt1)).setText(listItem.getNom_asegurado());
+					((TextView) view.findViewById(R.id.textViewEstadotxt2)).setText(listItem.getGlosa_cia());
+					((TextView) view.findViewById(R.id.textViewncasotxt11)).setText(listItem.getNom_contacto());
+					((TextView) view.findViewById(R.id.textViewEstadotxt21)).setText(listItem.getTelefono());
+					((TextView) view.findViewById(R.id.textViewncasotxt13)).setText(listItem.getObservaciones());
+					((TextView) view.findViewById(R.id.textViewEstadotxt23)).setText(listItem.getPatente());
+					((TextView) view.findViewById(R.id.textViewncasotxt14)).setText(listItem.getLleva_propuesta());
+					((TextView) view.findViewById(R.id.textViewEstadotxt24)).setText(listItem.getLleva_poliza());
+					((TextView) view.findViewById(R.id.textViewEstadotxt25)).setText(listItem.getFecha_visita());
+					
+					
 					view.setOnClickListener(new OnClickListener() {
 						public void onClick(View arg0) {
 							Intent myIntent = new Intent(listaCasos.this, sectionSelector.class);

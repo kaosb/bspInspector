@@ -15,8 +15,17 @@
     <string name="pass"> PASSWORD </string>
     <string name="recordar"> RECORDAR </string>
     <string name="OK"> OK </string>
-    <string name="ncaso"> Nº DE CASO </string>
+    <string name="ncaso"> Nº DE INSPECCIÓN</string>
     <string name="estado"> ESTADO </string>
     <string name="direccion"> DIRECCIÓN </string>
     <string name="ncampos"> NUMERO DE CAMPOS </string>
+    <string name="nasegurado"> NOMBRE ASEGURADO </string>
+    <string name="ncontacto"> NOMBRE CONTANCTO </string>
+    <string name="compania"> COMPAÑIA </string>
+    <string name="telefono"> TELEFONO: </string>
+    <string name="patente"> PATENTE: </string>
+    <string name="propuesta"> PROPUESTA: </string>
+    <string name="poliza"> POLIZA: </string>
+    <string name="observacion"> OBSERVACION </string>
+    <string name="fechayhora"> FECHA Y HORA </string>
 </resources>
