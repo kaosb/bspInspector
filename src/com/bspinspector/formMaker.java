@@ -7,11 +7,13 @@ import java.util.Date;
 import java.util.Locale;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -36,6 +38,9 @@ public class formMaker extends Activity {
 	private String cod_ubicacion;
 	private String sectionId;
 	
+	/*Progress Dialog*/
+	private ProgressDialog pd = null;
+	
 	/**
 	 * Elementos necesarios para generar la vista.
 	 * */
@@ -56,204 +61,224 @@ public class formMaker extends Activity {
 	File dbfile;
 	/**Trae los parametros desde la actividad anterior*/
 	Bundle bundle;
+	ScrollView sv;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState){
+	protected void onCreate(Bundle savedInstanceState){		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		bundle = getIntent().getExtras();
 		this.user = bundle.getString("user");
 		this.cod_ubicacion = bundle.getString("cod_ubicacion");
 		this.sectionId = bundle.getString("sectionId");
-		
-		Log.i("SESION", this.user+"/"+this.cod_ubicacion);
-
-		// Descargamos la BD con el form si es distinta a la version que tenemos.
-        Downloader dw = new Downloader();
-        dbfile = dw.getDB();
-        
-        //Consulta que obtiene los settings
-        File dbConfFile = getdDBFile();
-        if(dbConfFile.exists()){
-        	SQLiteDatabase dbConf = SQLiteDatabase.openOrCreateDatabase(dbConfFile, null);
-        	//Obtener conf de la BD
-        		String[] argConf = new String[] {"0",this.user};
-            	Cursor b = dbConf.query("tbl_settings",
-						new String [] {"type", "value"},
-						"status = ? AND user = ?",
-						argConf,
-						null,
-						null,
-						null);
-	        if(b.moveToFirst() && (b.getString(1) != null)){
-	        	// La configuracion guardada
-	        	itemspp = b.getInt(1);
-	        	Log.i("Cantidad conf", b.getString(1));
-	        }
-	        b.close();
-	        dbConf.close();
-        }
-        
-        
-        // Si tenemos la bd maestra para los forms entramos a consultarla
-        if(dbfile.exists()){
-        	
-        	SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbfile, null);
-            //Trabajar con la BD
-        		Log.i("seccion", this.sectionId);
-            	String[] args = new String[] {"0",this.sectionId};
-            	Cursor c = db.query("input",
-            						new String [] {"id", "section", "name", "type", "dep", "status"},
-            						"status = ? AND section = ?",
-            						args,
-            						null,
-            						null,
-            						null);
-        	
-            /*Crear Vista*/
-	            ScrollView sv = new ScrollView(this);
-	            ll = new LinearLayout(this);
-	            ll.setOrientation(LinearLayout.VERTICAL);
-	            sv.addView(ll);
-	            
-	            LinearLayout cabecera = new LinearLayout(this);
-	            cabecera.setBackgroundColor(Color.parseColor("#0A0C29"));
-	            cabecera.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, 40));
-	            cabecera.setPadding(10, 0, 10, 0);
-	            cabecera.setGravity(Gravity.CENTER);
-	            
-	            TextView tituloCabecera = new TextView(this);
-	            tituloCabecera.setText("Secci—n "+this.sectionId);
-	            tituloCabecera.setTextSize(18);
-	            tituloCabecera.setTextColor(Color.parseColor("#FFFFFF"));
-	            tituloCabecera.setTypeface(null, Typeface.BOLD);
-	            
-	            cabecera.addView(tituloCabecera);
-	            
-	            ll.addView(cabecera);
-	            
-	            llcont = new LinearLayout(this);
-	            llcont.setOrientation(LinearLayout.VERTICAL);
-	            ll.addView(llcont);
-	            /**
-	             * Llamo a la funcion responsable de generar el formulario
-	             * le paso como parametro el contador actual de
-	             * */
-	            crearFormulario(c,db,itemspp,itemcount);
-
-	        c.close();
-            db.close();
-            
-            
-            /*BOTONES*/            
-            Button siguiente = new Button(this);
-            siguiente.setText("Siguiente");
-            siguiente.setOnClickListener(new View.OnClickListener() {
-            	public void onClick(View v) {
-            		String Data = "";
-            		int childcount = llcont.getChildCount();
-            		
-            		for (int i=0; i < childcount; i++){
-            		      View vista = llcont.getChildAt(i);
-            		      LinearLayout lltemp = (LinearLayout) vista;
-            		      Log.i("TAG:", "PreguntaID->"+llcont.getChildAt(i).getTag()+" FieldType:"+lltemp.getChildAt(1).getTag());
-            		      
-            		      String id = (String) llcont.getChildAt(i).getTag();
-            		      int type = (Integer) lltemp.getChildAt(1).getTag();
-            		      
-            		      TextView txtTemp = (TextView) lltemp.getChildAt(0);
-            		      String label = (String) txtTemp.getText();
-            		      
-            		      switch(type){
-              			
-	               			case 1:
-	               				EditText redtt = (EditText) findViewById(Integer.parseInt(id));
-	               				Data= Data+label+": "+redtt.getText()+"\n";
-	               				saveFieldValue(Integer.parseInt(id),redtt.getText().toString());
-	               				break;
-               				
-	               			case 2:
-	               				Spinner spinner = (Spinner) findViewById(Integer.parseInt(id));
-	               				Data= Data+label+": "+spinner.getSelectedItem()+"\n";
-	               				saveFieldValue(Integer.parseInt(id),spinner.getSelectedItem().toString());
-	               				break;
-	               				
-	               			case 3:
-	               				CheckBox checkbox = (CheckBox) findViewById(Integer.parseInt(id));
-	               				if(checkbox.isChecked()){
-	               					Data= Data+label+": "+checkbox.getId()+"\n";
-	               					//saveFieldValue(Integer.parseInt(id),"chek".toString());
-	               				}
-	               				break;
-	               				
-	               			case 4:
-	               				RadioGroup rbg = (RadioGroup) findViewById(Integer.parseInt(id));
-	               				Data= Data+label+": "+rbg.getCheckedRadioButtonId()/100+"\n";
-	               				//saveFieldValue(Integer.parseInt(id),"");
-	               				break;
+		this.sv = new ScrollView(this);
+		/*Lanzamos mensaje y tarea async*/
+	    this.pd = ProgressDialog.show(this, "", "Cargando...", true, false);
+        new DownloadTask().execute("");
+	}
 	
-	               			default:
-	               				EditText redtd = (EditText) findViewById(Integer.parseInt(id));
-	               				try{
-	               					Data= Data+"\n"+label+": "+redtd.getText();
-	               					//saveFieldValue(Integer.parseInt(id),redtd.getText().toString());
-	               				}catch(Exception e){
-	               					Data= Data+label+": "+"cuack"+"\n";
-	               					//saveFieldValue(Integer.parseInt(id),"cuack");
-	               				}
-	               				break;
-            		      }
-   
-            		}
-            		
-            		Toast.makeText(formMaker.this, "Se acaban de guardar en tu equipo los siguientes datos:\n"+Data, Toast.LENGTH_SHORT).show();
-    	        	SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbfile, null);
-    	            //Trabajar con la BD
-    	            	String[] args = new String[] {"0", sectionId};
-    	            	Cursor c = db.query("input",
-    	            						new String [] {"id", "section", "name", "type", "dep", "status"},
-    	            						"status = ? AND section = ?",
-    	            						args,
-    	            						null,
-    	            						null,
-    	            						null);
-    	            llcont.removeAllViews();
-    	            crearFormulario(c,db,itemspp,itemcount);
+	
+	/**
+	 * Clase AsyncTask
+	 * */
+	private class DownloadTask extends AsyncTask<String, Void, Object> {
+        protected Object doInBackground(String... args) {
+        	// Descargamos la BD con el form si es distinta a la version que tenemos.
+            Downloader dw = new Downloader();
+            dbfile = dw.getDB();
+            
+            //Consulta que obtiene los settings
+            File dbConfFile = getdDBFile();
+            if(dbConfFile.exists()){
+            	SQLiteDatabase dbConf = SQLiteDatabase.openOrCreateDatabase(dbConfFile, null);
+            	//Obtener conf de la BD
+            		String[] argConf = new String[] {"0",formMaker.this.user};
+                	Cursor b = dbConf.query("tbl_settings",
+    						new String [] {"type", "value"},
+    						"status = ? AND user = ?",
+    						argConf,
+    						null,
+    						null,
+    						null);
+    	        if(b.moveToFirst() && (b.getString(1) != null)){
+    	        	// La configuracion guardada
+    	        	itemspp = b.getInt(1);
+    	        	Log.i("Cantidad conf", b.getString(1));
+    	        }
+    	        b.close();
+    	        dbConf.close();
+            }
+            
+            
+            // Si tenemos la bd maestra para los forms entramos a consultarla
+            if(dbfile.exists()){
+            	
+            	SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbfile, null);
+                //Trabajar con la BD
+            		Log.i("seccion", formMaker.this.sectionId);
+                	String[] argus = new String[] {"0",formMaker.this.sectionId};
+                	Cursor c = db.query("input",
+                						new String [] {"id", "section", "name", "type", "dep", "status"},
+                						"status = ? AND section = ?",
+                						argus,
+                						null,
+                						null,
+                						null);
+            	
+                /*Crear Vista*/
+    	            ll = new LinearLayout(formMaker.this);
+    	            ll.setOrientation(LinearLayout.VERTICAL);
+    	            formMaker.this.sv.addView(ll);
     	            
+    	            LinearLayout cabecera = new LinearLayout(formMaker.this);
+    	            cabecera.setBackgroundColor(Color.parseColor("#0A0C29"));
+    	            cabecera.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, 40));
+    	            cabecera.setPadding(10, 0, 10, 0);
+    	            cabecera.setGravity(Gravity.CENTER);
+    	            
+    	            TextView tituloCabecera = new TextView(formMaker.this);
+    	            tituloCabecera.setText("Secci—n "+formMaker.this.sectionId);
+    	            tituloCabecera.setTextSize(18);
+    	            tituloCabecera.setTextColor(Color.parseColor("#FFFFFF"));
+    	            tituloCabecera.setTypeface(null, Typeface.BOLD);
+    	            
+    	            cabecera.addView(tituloCabecera);
+    	            
+    	            ll.addView(cabecera);
+    	            
+    	            llcont = new LinearLayout(formMaker.this);
+    	            llcont.setOrientation(LinearLayout.VERTICAL);
+    	            ll.addView(llcont);
+    	            /**
+    	             * Llamo a la funcion responsable de generar el formulario
+    	             * le paso como parametro el contador actual de
+    	             * */
+    	            crearFormulario(c,db,itemspp,itemcount);
+
     	        c.close();
                 db.close();
-            	}
-            });
-            
-            Button atras = new Button(this);
-            atras.setText("Atras");
-            atras.setOnClickListener(new View.OnClickListener() {
-            	public void onClick(View v) {
-            		finish();
-            	}
-            });
-            
-       	 	LinearLayout botonera = new LinearLayout(this);
-       	 	botonera.setOrientation(LinearLayout.HORIZONTAL);
-       	 	botonera.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-       	 	botonera.setBackgroundColor(Color.parseColor("#0A0C29"));
-       	 	
-       	 	botonera.addView(atras);
-       	 	botonera.addView(siguiente);
+                
+                
+                /*BOTONES*/            
+                Button siguiente = new Button(formMaker.this);
+                siguiente.setText("Siguiente");
+                siguiente.setOnClickListener(new View.OnClickListener() {
+                	public void onClick(View v) {
+                		String Data = "";
+                		int childcount = llcont.getChildCount();
+                		
+                		for (int i=0; i < childcount; i++){
+                		      View vista = llcont.getChildAt(i);
+                		      LinearLayout lltemp = (LinearLayout) vista;
+                		      Log.i("TAG:", "PreguntaID->"+llcont.getChildAt(i).getTag()+" FieldType:"+lltemp.getChildAt(1).getTag());
+                		      
+                		      String id = (String) llcont.getChildAt(i).getTag();
+                		      int type = (Integer) lltemp.getChildAt(1).getTag();
+                		      
+                		      TextView txtTemp = (TextView) lltemp.getChildAt(0);
+                		      String label = (String) txtTemp.getText();
+                		      
+                		      switch(type){
+                  			
+    	               			case 1:
+    	               				EditText redtt = (EditText) findViewById(Integer.parseInt(id));
+    	               				Data= Data+label+": "+redtt.getText()+"\n";
+    	               				saveFieldValue(Integer.parseInt(id),redtt.getText().toString());
+    	               				break;
+                   				
+    	               			case 2:
+    	               				Spinner spinner = (Spinner) findViewById(Integer.parseInt(id));
+    	               				Data= Data+label+": "+spinner.getSelectedItem()+"\n";
+    	               				saveFieldValue(Integer.parseInt(id),spinner.getSelectedItem().toString());
+    	               				break;
+    	               				
+    	               			case 3:
+    	               				CheckBox checkbox = (CheckBox) findViewById(Integer.parseInt(id));
+    	               				if(checkbox.isChecked()){
+    	               					Data= Data+label+": "+checkbox.getId()+"\n";
+    	               					//saveFieldValue(Integer.parseInt(id),"chek".toString());
+    	               				}
+    	               				break;
+    	               				
+    	               			case 4:
+    	               				RadioGroup rbg = (RadioGroup) findViewById(Integer.parseInt(id));
+    	               				Data= Data+label+": "+rbg.getCheckedRadioButtonId()/100+"\n";
+    	               				//saveFieldValue(Integer.parseInt(id),"");
+    	               				break;
+    	
+    	               			default:
+    	               				EditText redtd = (EditText) findViewById(Integer.parseInt(id));
+    	               				try{
+    	               					Data= Data+"\n"+label+": "+redtd.getText();
+    	               					//saveFieldValue(Integer.parseInt(id),redtd.getText().toString());
+    	               				}catch(Exception e){
+    	               					Data= Data+label+": "+"cuack"+"\n";
+    	               					//saveFieldValue(Integer.parseInt(id),"cuack");
+    	               				}
+    	               				break;
+                		      }
+       
+                		}
+                		
+                		Toast.makeText(formMaker.this, "Se acaban de guardar en tu equipo los siguientes datos:\n"+Data, Toast.LENGTH_SHORT).show();
+        	        	SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbfile, null);
+        	            //Trabajar con la BD
+        	            	String[] args = new String[] {"0", sectionId};
+        	            	Cursor c = db.query("input",
+        	            						new String [] {"id", "section", "name", "type", "dep", "status"},
+        	            						"status = ? AND section = ?",
+        	            						args,
+        	            						null,
+        	            						null,
+        	            						null);
+        	            llcont.removeAllViews();
+        	            crearFormulario(c,db,itemspp,itemcount);
+        	            
+        	        c.close();
+                    db.close();
+                	}
+                });
+                
+                Button atras = new Button(formMaker.this);
+                atras.setText("Atras");
+                atras.setOnClickListener(new View.OnClickListener() {
+                	public void onClick(View v) {
+                		finish();
+                	}
+                });
+                
+           	 	LinearLayout botonera = new LinearLayout(formMaker.this);
+           	 	botonera.setOrientation(LinearLayout.HORIZONTAL);
+           	 	botonera.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+           	 	botonera.setBackgroundColor(Color.parseColor("#0A0C29"));
+           	 	
+           	 	botonera.addView(atras);
+           	 	botonera.addView(siguiente);
 
-            ll.addView(botonera);
-            
-            View pie = new View(this);
-            pie.setBackgroundColor(Color.parseColor("#0A0C29"));
-            pie.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, 40));
-            ll.addView(pie);
-            
-            /*FIN BOTONERA*/
-            
-            this.setContentView(sv);
+                ll.addView(botonera);
+                
+                View pie = new View(formMaker.this);
+                pie.setBackgroundColor(Color.parseColor("#0A0C29"));
+                pie.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, 40));
+                ll.addView(pie);
+                
+                /*FIN BOTONERA*/
 
+            }
+            return false;
         }
-	}
+
+        protected void onPostExecute(Object result) {
+        	// Pos ejecucion
+        	formMaker.this.setContentView(formMaker.this.sv);
+        	formMaker.this.pd.dismiss();
+        }
+	} 
+	/**
+	 * fin clase AsyncTask
+	 * */
+	
+	
 	/**
 	 * GET Archivo DB
 	 * Funcion encargada de obtener el archivo con la BD que contiene los settings
@@ -268,6 +293,7 @@ public class formMaker extends Activity {
         File dbfile = new File(dir + "/BSP.sqlite");
         return dbfile;
 	}
+	
 	/**
 	 * Crear formulario
 	 * Funcion encargada de crear la vista del formulario a partir 
@@ -515,14 +541,17 @@ public class formMaker extends Activity {
             	 llcont.addView(cont);
             	 item++;
             	 Log.i("item", item+"<"+itemspp+"-->"+c.getPosition()+" de "+c.getCount());
+            	 
              }while(c.moveToNext() && item < itemspp);
              //Mantiene el index y posicion
              itemcount = c.getPosition();
              Log.i("Index cursor:", ""+itemcount);
+             
         }else{
         	finish();
         }
 	}
+	
 	/**
 	 * Funcion para obtener el valor de un campo de formulario
 	 * */
@@ -553,6 +582,7 @@ public class formMaker extends Activity {
 		}
         
 	}
+	
 	/**
 	 * Funcion para guardar el valor de un campo de formulario
 	 * */
@@ -597,6 +627,7 @@ public class formMaker extends Activity {
         dbTarget.close();
         
 	}
+	
 	/**
 	 * getdDBSaveDataFile
 	 * function encargada de crear y obtener la referencia al archivo donde se almacenan los valores ingresados en el formulario
@@ -611,6 +642,7 @@ public class formMaker extends Activity {
         File dbfile = new File(dir + "/datos.sqlite");
         return dbfile;
 	}
+	
 	/**
 	 * createTableDB
 	 * Funcion que crea la Tabla si esta no existe.
