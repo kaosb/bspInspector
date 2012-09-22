@@ -35,6 +35,7 @@ public class formMaker extends Activity {
 	private String user;
 	private String cod_ubicacion;
 	private String sectionId;
+	
 	/**
 	 * Elementos necesarios para generar la vista.
 	 * */
@@ -42,6 +43,7 @@ public class formMaker extends Activity {
 	LinearLayout ll;
 	/**Linear Layout que donde se despliegan los campos por pagina*/
 	LinearLayout llcont;
+	
 	/**
 	 * Campos necesarios para la paginacion
 	 * */
@@ -49,6 +51,7 @@ public class formMaker extends Activity {
 	int itemcount = 0;
 	/**Items por pagina*/
 	int itemspp = 0;
+	
 	/**Mantiene visible el archivo con la BD para generar los formularios*/
 	File dbfile;
 	/**Trae los parametros desde la actividad anterior*/
