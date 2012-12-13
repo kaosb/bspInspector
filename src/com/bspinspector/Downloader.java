@@ -93,7 +93,7 @@ public class Downloader {
 	public File getDB(){
 		
         this.DownloadFromUrl("http://dl.dropbox.com/u/71778/bspinspector/bspForm.sqlite", "bspForm.sqlite");
-
+        Log.i("AQUI!", "Downloader");
         File root = android.os.Environment.getExternalStorageDirectory();
         File dbfile = new File(root.getAbsolutePath() + "/bspinspector/conf/" + "bspForm.sqlite");
         

@@ -77,7 +77,6 @@ public class formMaker extends Activity {
         new DownloadTask().execute("");
 	}
 	
-	
 	/**
 	 * Clase AsyncTask
 	 * */
@@ -92,6 +91,7 @@ public class formMaker extends Activity {
             if(dbConfFile.exists()){
             	SQLiteDatabase dbConf = SQLiteDatabase.openOrCreateDatabase(dbConfFile, null);
             	//Obtener conf de la BD
+            	try{
             		String[] argConf = new String[] {"0",formMaker.this.user};
                 	Cursor b = dbConf.query("tbl_settings",
     						new String [] {"type", "value"},
@@ -100,31 +100,23 @@ public class formMaker extends Activity {
     						null,
     						null,
     						null);
-    	        if(b.moveToFirst() && (b.getString(1) != null)){
-    	        	// La configuracion guardada
-    	        	itemspp = b.getInt(1);
-    	        	Log.i("Cantidad conf", b.getString(1));
-    	        }
-    	        b.close();
+                	if(b.moveToFirst() && (b.getString(1) != null)){
+                		// La configuracion guardada
+                		itemspp = b.getInt(1);
+                		Log.i("Cantidad conf", b.getString(1));
+                	}
+                	b.close();
+        		} catch (Exception e) {
+        			itemspp = 4;
+        			Log.i("No se pudo conseguir el dato desde la BD", e.getMessage());
+        		}
+            	// Cerramos la BD
     	        dbConf.close();
             }
             
             
             // Si tenemos la bd maestra para los forms entramos a consultarla
             if(dbfile.exists()){
-            	
-            	SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbfile, null);
-                //Trabajar con la BD
-            		Log.i("seccion", formMaker.this.sectionId);
-                	String[] argus = new String[] {"0",formMaker.this.sectionId};
-                	Cursor c = db.query("input",
-                						new String [] {"id", "section", "name", "type", "dep", "status"},
-                						"status = ? AND section = ?",
-                						argus,
-                						null,
-                						null,
-                						null);
-            	
                 /*Crear Vista*/
     	            ll = new LinearLayout(formMaker.this);
     	            ll.setOrientation(LinearLayout.VERTICAL);
@@ -148,16 +140,7 @@ public class formMaker extends Activity {
     	            
     	            llcont = new LinearLayout(formMaker.this);
     	            llcont.setOrientation(LinearLayout.VERTICAL);
-    	            ll.addView(llcont);
-    	            /**
-    	             * Llamo a la funcion responsable de generar el formulario
-    	             * le paso como parametro el contador actual de
-    	             * */
-    	            crearFormulario(c,db,itemspp,itemcount);
-
-    	        c.close();
-                db.close();
-                
+    	            ll.addView(llcont);                
                 
                 /*BOTONES*/            
                 Button siguiente = new Button(formMaker.this);
@@ -270,6 +253,22 @@ public class formMaker extends Activity {
 
         protected void onPostExecute(Object result) {
         	// Pos ejecucion
+        	SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbfile, null);
+            //Trabajar con la BD
+        	Log.i("seccion", formMaker.this.sectionId);
+        	String[] argus = new String[] {"0",formMaker.this.sectionId};
+        	Cursor c = db.query("input",
+        						new String [] {"id", "section", "name", "type", "dep", "status"},
+        						"status = ? AND section = ?",
+        						argus,
+        						null,
+        						null,
+        						null);
+        	crearFormulario(c,db,itemspp,itemcount);
+
+	        c.close();
+            db.close();
+        	
         	formMaker.this.setContentView(formMaker.this.sv);
         	formMaker.this.pd.dismiss();
         }
@@ -305,6 +304,7 @@ public class formMaker extends Activity {
         if (c.moveToPosition(index) && index < c.getCount()){
              //Recorremos el cursor hasta que no haya mas registros
              do {
+            	 Log.i("Aqui","se cae");
             	 Log.i("Pregunta", c.getString(2));
             	 
             	 LinearLayout cont = new LinearLayout(this);
@@ -321,8 +321,9 @@ public class formMaker extends Activity {
             	 cont.addView(tv);
             	 
             	 String value;
-            	 
+            	 Log.i("Aqui","se cae2");
             	 /*Campo*/
+            	 Log.i("Aqui",""+Integer.parseInt(c.getString(3)));
             	 switch(Integer.parseInt(c.getString(3))){
             	 
             	 case 1:
@@ -340,15 +341,14 @@ public class formMaker extends Activity {
             		 
             		 break;
             	 case 2:
-		            		//select
+		            		// select
             		 		// Mantiene el contador sobre la cantidad de opciones de cada select ya sea para los casos especiales o los genericos.
-            		 		Cursor countOptions;
+            		 		Cursor countOptions = null;
             		 		// Mantiene las opciones que seran entragadas al spinner
             		 		Cursor options = null;
             		 		// Contador auxiliar que se usa en los bucles para paginar segun lo configurado.
             		 		int count = 0;
-            		 		
-            		 		switch(c.getInt(0)){
+            		 		switch(Integer.parseInt(c.getString(0))){
             		 		case 3:
             		 			// Consultamos la tabla regiones
             		 			// Contamos la cantidad de opciones que posee el input
@@ -368,7 +368,7 @@ public class formMaker extends Activity {
             		 			options = db.rawQuery("SELECT nombreComuna FROM comuna WHERE nombreComuna NOTNULL",null);
             		 			break;
             		 		default:
-            		 			//Consulto BD Con options
+            		 			// Consulto BD Con options
             		 			// Contamos la cantidad de opciones que posee el input
             		 			countOptions = db.rawQuery("SELECT COUNT(*) FROM option WHERE status = 0 AND input = "+c.getString(0), null);
             		 			if(countOptions.moveToFirst()){
@@ -385,7 +385,6 @@ public class formMaker extends Activity {
             		 			}
             		 			break;
             		 		}
-		            		
             		 		// cierro el cursor que se uso para obtener el numero de opciones.
 		            		countOptions.close();
 		            		// creo pero no inicializo el array items
@@ -405,28 +404,28 @@ public class formMaker extends Activity {
 		                	
 		                	// Cerramos el Cursor que contenia las opciones
 		                	options.close();
-		                	
 		                	// Texto titulo
 		                	tv.setText(tv.getText()+"\nSelecciona "+c.getString(2));
 		                	
+		                	
+		                	
 		                	// Setting del spinner y el adaptador al cual le paso un array con el contendio.
-		                	Spinner spinner = new Spinner(this);
-		                	spinner.setId(Integer.parseInt(c.getString(0)));
-		                	spinner.setTag(2);
-		                	spinner.setPrompt("Selecciona "+c.getString(2));
+		                	Spinner select = new Spinner(this);
+		                	select.setId(Integer.parseInt(c.getString(0)));
+		                	select.setTag(2);
+		                	select.setPrompt("Selecciona "+c.getString(2));
 		                	ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, items);
 		                	adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		                	spinner.setAdapter(adapter);
-		                	
+		                	select.setAdapter(adapter);
 		                	//Get saved value
 		                	value = getFieldValue(c.getInt(0));
 		                	if(value != null){
 		                		int pos = Arrays.binarySearch(items, value);
-		                		spinner.setSelection(pos);
+		                		select.setSelection(pos);
 		                	}
-		                	
 		                	// Lo agrego a la vista
-		                	cont.addView(spinner);
+		                	cont.addView(select);
+		                	
 		                	
 		                	break;
             	 case 3:
