@@ -2,7 +2,6 @@ package com.bspinspector;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
@@ -20,6 +19,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -153,11 +153,17 @@ public class formMaker extends Activity {
                 		for (int i=0; i < childcount; i++){
                 		      View vista = llcont.getChildAt(i);
                 		      LinearLayout lltemp = (LinearLayout) vista;
-                		      Log.i("TAG:", "PreguntaID->"+llcont.getChildAt(i).getTag()+" FieldType:"+lltemp.getChildAt(1).getTag());
+                		      Log.i("TAG:", "PreguntaID->"+llcont.getChildAt(i).getTag()+" FieldType:"+llcont.getChildAt(1).getTag());
                 		      
                 		      String id = (String) llcont.getChildAt(i).getTag();
-                		      int type = (Integer) lltemp.getChildAt(1).getTag();
-                		      
+                		      // Que pasa cuando viene un checkbox??????
+                		      // Este id al parecer no viene
+                		      int type = 0;
+                		      try{
+                		    	  type = (Integer) lltemp.getChildAt(1).getTag();
+                		      }catch(Exception e){
+                		    	  type = 3;
+                		      }
                 		      TextView txtTemp = (TextView) lltemp.getChildAt(0);
                 		      String label = (String) txtTemp.getText();
                 		      
@@ -179,7 +185,7 @@ public class formMaker extends Activity {
     	               				CheckBox checkbox = (CheckBox) findViewById(Integer.parseInt(id));
     	               				if(checkbox.isChecked()){
     	               					Data= Data+label+": "+checkbox.getId()+"\n";
-    	               					//saveFieldValue(Integer.parseInt(id),"chek".toString());
+    	               					saveFieldValue(Integer.parseInt(id),"chek".toString());
     	               				}
     	               				break;
     	               				
@@ -187,6 +193,24 @@ public class formMaker extends Activity {
     	               				RadioGroup rbg = (RadioGroup) findViewById(Integer.parseInt(id));
     	               				Data= Data+label+": "+rbg.getCheckedRadioButtonId()/100+"\n";
     	               				//saveFieldValue(Integer.parseInt(id),"");
+    	               				break;
+    	               				
+    	               			case 5:
+    	               				EditText redtn = (EditText) findViewById(Integer.parseInt(id));
+    	               				Data= Data+label+": "+redtn.getText()+"\n";
+    	               				saveFieldValue(Integer.parseInt(id),redtn.getText().toString());
+    	               				break;
+    	               				
+    	               			case 6:
+    	               				EditText redte = (EditText) findViewById(Integer.parseInt(id));
+    	               				Data= Data+label+": "+redte.getText()+"\n";
+    	               				saveFieldValue(Integer.parseInt(id),redte.getText().toString());
+    	               				break;
+    	               				
+    	               			case 7:
+    	               				EditText redtr = (EditText) findViewById(Integer.parseInt(id));
+    	               				Data= Data+label+": "+redtr.getText()+"\n";
+    	               				saveFieldValue(Integer.parseInt(id),redtr.getText().toString());
     	               				break;
     	
     	               			default:
@@ -292,6 +316,20 @@ public class formMaker extends Activity {
         File dbfile = new File(dir + "/BSP.sqlite");
         return dbfile;
 	}
+	/**
+	 * Get Index of value from spinner adapter
+	 */
+	private int indexOf(final Adapter adapter, Object value)
+	{
+	    for (int index = 0, count = adapter.getCount(); index < count; ++index)
+	    {
+	        if (adapter.getItem(index).equals(value))
+	        {
+	            return index;
+	        }
+	    }
+	    return -1;
+	}
 	
 	/**
 	 * Crear formulario
@@ -304,7 +342,6 @@ public class formMaker extends Activity {
         if (c.moveToPosition(index) && index < c.getCount()){
              //Recorremos el cursor hasta que no haya mas registros
              do {
-            	 Log.i("Aqui","se cae");
             	 Log.i("Pregunta", c.getString(2));
             	 
             	 LinearLayout cont = new LinearLayout(this);
@@ -321,7 +358,6 @@ public class formMaker extends Activity {
             	 cont.addView(tv);
             	 
             	 String value;
-            	 Log.i("Aqui","se cae2");
             	 /*Campo*/
             	 Log.i("Aqui",""+Integer.parseInt(c.getString(3)));
             	 switch(Integer.parseInt(c.getString(3))){
@@ -366,6 +402,15 @@ public class formMaker extends Activity {
             		 			count= countOptions.getInt(0);
             		 			// Consultamos las opciones asociadas al input
             		 			options = db.rawQuery("SELECT nombreComuna FROM comuna WHERE nombreComuna NOTNULL",null);
+            		 			break;
+            		 		case 19:
+            		 			// Consultamos la tabla tipos de vehiculo
+            		 			// Contamos la cantidad de opciones que posee el input
+            		 			countOptions = db.rawQuery("SELECT COUNT(*) FROM tipos_vehiculo WHERE tipo NOTNULL", null);
+            		 			countOptions.moveToFirst();
+            		 			count= countOptions.getInt(0);
+            		 			// Consultamos las opciones asociadas al input
+            		 			options = db.rawQuery("SELECT tipo FROM tipos_vehiculo WHERE tipo NOTNULL",null);
             		 			break;
             		 		default:
             		 			// Consulto BD Con options
@@ -420,7 +465,9 @@ public class formMaker extends Activity {
 		                	//Get saved value
 		                	value = getFieldValue(c.getInt(0));
 		                	if(value != null){
-		                		int pos = Arrays.binarySearch(items, value);
+		                		//int pos = Arrays.binarySearch(items, value);
+		                		int pos = this.indexOf(adapter, value);
+		                		Log.i("posicion seleccionado", String.valueOf(pos));
 		                		select.setSelection(pos);
 		                	}
 		                	// Lo agrego a la vista
@@ -436,6 +483,10 @@ public class formMaker extends Activity {
             		 checkBox.setTag(3);
             		 //Todo el codigo para manejar el checkbox
             		 cont.addView(checkBox);
+            		 value = getFieldValue(c.getInt(0));
+            		 if(value != null){
+            			 Log.i("Valor Checkbox", String.valueOf(value));
+            		 }
             		 
             		 break;
             	 case 4:
@@ -466,9 +517,10 @@ public class formMaker extends Activity {
             		 EditText edtn = new EditText(this);
             		 edtn.setId(Integer.parseInt(c.getString(0)));
             		 edtn.setTag(5);
-            		 edtn.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
+            		 edtn.setInputType(InputType.TYPE_CLASS_NUMBER);
             		 cont.addView(edtn);
             		 value = getFieldValue(c.getInt(0));
+            		 Log.i("Clase 5", String.valueOf(value));
             		 if(value != null){
             			 edtn.setText(value.toString());
             		 }
@@ -480,7 +532,7 @@ public class formMaker extends Activity {
             		 EditText edtm = new EditText(this);
             		 edtm.setId(Integer.parseInt(c.getString(0)));
             		 edtm.setTag(6);
-            		 edtm.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+            		 edtm.setInputType( InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS );
             		 cont.addView(edtm);
             		 value = getFieldValue(c.getInt(0));
             		 if(value != null){
@@ -503,14 +555,73 @@ public class formMaker extends Activity {
             		 
             		 break;
             	 case 8:
-            		 // textedit autocompletar
-            		 tv.setText(tv.getText()+"\nIngresa "+c.getString(2));
-            		 EditText edta = new EditText(this);
-            		 edta.setId(Integer.parseInt(c.getString(0)));
-            		 edta.setTag(8);
-            		 edta.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-            		 cont.addView(edta);
-            		 
+        			 // Mantiene el contador sobre la cantidad de opciones de cada select ya sea para los casos especiales o los genericos.
+            		 Cursor countOptionsauto = null;
+            		 // Mantiene las opciones que seran entragadas al spinner
+            		 Cursor optionsauto = null;
+            		 int countauto = 0;
+            		 switch(Integer.parseInt(c.getString(0))){
+	            		 case 23:
+	            			 // Marca
+	            			 // Consultamos la tabla marcas
+	            			 // Contamos la cantidad de opciones que posee la tabla
+	            			 countOptionsauto = db.rawQuery("SELECT COUNT(*) FROM marcas WHERE nombreMarca NOTNULL", null);
+	            			 countOptionsauto.moveToFirst();
+	            			 countauto = countOptionsauto.getInt(0);
+	            			 // Consultamos las opciones asociadas al input
+	            			 optionsauto = db.rawQuery("SELECT nombreMarca FROM marcas WHERE nombreMarca NOTNULL",null);
+	            			 break;
+	            		 case 24:
+	            			 // Modelo
+	            			 // Consultamos la tabla modelo
+	            			 // Contamos la cantidad de opciones que posee la tabla
+	            			 countOptionsauto = db.rawQuery("SELECT COUNT(*) FROM modelos WHERE nombreModelo NOTNULL", null);
+	            			 countOptionsauto.moveToFirst();
+	            			 countauto = countOptionsauto.getInt(0);
+	            			 // Consultamos las opciones asociadas al input
+	            			 optionsauto = db.rawQuery("SELECT nombreModelo FROM modelos WHERE nombreModelo NOTNULL",null);
+	            			 break;
+            		 }
+            		 if(countauto != 0){
+        			 // cierro el cursor que se uso para obtener el numero de opciones.
+        			 countOptionsauto.close();
+        			 // creo pero no inicializo el array items
+        			 String[] itemsauto;
+
+        			 // Aqui se traspasa los objetos en el Cursor con opciones al array items el cual es entregado al spinner adapter.
+        			 if(optionsauto.moveToFirst()){
+        				 itemsauto = new String[countauto];
+        				 int temp = 0;
+        				 do{
+        					 itemsauto[temp] = optionsauto.getString(0);
+        					 temp++;
+        				 }while(optionsauto.moveToNext() && optionsauto.getPosition() < optionsauto.getCount() );
+        			 }else{
+        				 itemsauto = new String[] {"1","2","3","4"};
+        			 }
+        			 // Cerramos el Cursor que contenia las opciones
+        			 optionsauto.close();
+
+        			 // Texto titulo
+        			 tv.setText(tv.getText()+"\nSelecciona "+c.getString(2));
+        			 
+        			 // Setting del spinner y el adaptador al cual le paso un array con el contendio.
+        			 Spinner selectauto = new Spinner(this);
+        			 selectauto.setId(Integer.parseInt(c.getString(0)));
+        			 selectauto.setTag(2);
+        			 selectauto.setPrompt("Selecciona "+c.getString(2));
+        			 ArrayAdapter<String> adapterauto = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, itemsauto);
+        			 adapterauto.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        			 selectauto.setAdapter(adapterauto);
+        			 //Get saved value
+        			 value = getFieldValue(c.getInt(0));
+        			 if(value != null){
+        				 int pos = this.indexOf(adapterauto, value);
+        				 selectauto.setSelection(pos);
+        			 }
+        			 // Lo agrego a la vista
+        			 cont.addView(selectauto);
+            		 }
             		 break;
             	 case 9:
             		 // textedit fecha
@@ -566,7 +677,7 @@ public class formMaker extends Activity {
         }else{
         	dbTarget = createTableDB(dbfileSaveData);
         }
-        Cursor count = dbTarget.rawQuery("SELECT value FROM dataInProgress WHERE idInput =" + fieldID+" AND idCase="+cod_ubicacion, null);
+        Cursor count = dbTarget.rawQuery("SELECT value FROM dataInProgress WHERE idInput =" + fieldID + " AND idCase=" + cod_ubicacion, null);
 		
         if(count.moveToFirst()){
 			Log.i("return->",count.getString(0));
@@ -599,10 +710,10 @@ public class formMaker extends Activity {
         	dbTarget = createTableDB(dbfileSaveData);
         }
         
-        SimpleDateFormat s = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        SimpleDateFormat s = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.US);
         String date = s.format(new Date());
         
-        Cursor count = dbTarget.rawQuery("SELECT COUNT(*) FROM dataInProgress WHERE idInput =" + fieldID+" AND idCase="+cod_ubicacion, null);
+        Cursor count = dbTarget.rawQuery("SELECT COUNT(*) FROM dataInProgress WHERE idInput =" + fieldID + " AND idCase=" + cod_ubicacion, null);
         
         int resp = 0;
         ContentValues newValues = new ContentValues();
@@ -612,7 +723,7 @@ public class formMaker extends Activity {
         if(count.getInt(0)>0){
     		newValues.put("value", value);
     		newValues.put("update_at", date);
-    		resp = dbTarget.update("dataInProgress", newValues, "idInput =" + fieldID+" AND idCase="+cod_ubicacion, null);
+    		resp = dbTarget.update("dataInProgress", newValues, "idInput =" + fieldID + " AND idCase=" + cod_ubicacion, null);
     		Log.i("rows actualizadas: ", ""+resp);
         }else{
     		newValues.put("idCase", cod_ubicacion);
