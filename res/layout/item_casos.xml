@@ -1,0 +1,523 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/linearItem"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+        <View
+            android:id="@+id/textViewSepusr"
+            android:layout_width="wrap_content"
+            android:layout_height="2dp"
+            android:background="#3F8A00" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#DDDDDD"
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:id="@+id/imageView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="35dp"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/greenball" />
+
+            <TextView
+                android:id="@+id/textViewncaso"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="3dp"
+                android:text="@string/ncaso"
+                android:textColor="#838383"
+                android:textSize="14dp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="50dp"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/greenball" />
+
+            <TextView
+                android:id="@+id/textViewEstado"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="3dp"
+                android:text="@string/estado"
+                android:textColor="#838383"
+                android:textSize="14dp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#CFDCE9"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/textViewncasotxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="40dp"
+                android:layout_marginTop="5dp"
+                android:background="#FDFDFD"
+                android:padding="3dp"
+                android:text="@string/ncaso"
+                android:textColor="#838383"
+                android:textSize="14dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textViewEstadotxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="105dp"
+                android:layout_marginTop="5dp"
+                android:background="#FDFDFD"
+                android:padding="3dp"
+                android:text="@string/estado"
+                android:textColor="#838383"
+                android:textSize="14dp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <View
+            android:id="@+id/textViewSepusr2"
+            android:layout_width="wrap_content"
+            android:layout_height="2dp"
+            android:background="#3F8A00" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#DDDDDD"
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:id="@+id/imageView11"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="35dp"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/greenball" />
+
+            <TextView
+                android:id="@+id/textViewncaso1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="3dp"
+                android:text="@string/nasegurado"
+                android:textColor="#838383"
+                android:textSize="14dp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#CFDCE9"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/textViewncasotxt1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="40dp"
+                android:layout_marginTop="5dp"
+                android:background="#FDFDFD"
+                android:padding="3dp"
+                android:text="@string/nasegurado"
+                android:textColor="#838383"
+                android:textSize="14dp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <View
+            android:id="@+id/textViewSepusr21"
+            android:layout_width="wrap_content"
+            android:layout_height="2dp"
+            android:background="#3F8A00" />
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#DDDDDD"
+            android:orientation="horizontal" >
+        
+            <ImageView
+                android:id="@+id/imageView21"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="35dp"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/greenball" />
+
+            <TextView
+                android:id="@+id/textViewEstado2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="3dp"
+                android:text="@string/compania"
+                android:textColor="#838383"
+                android:textSize="14dp"
+                android:textStyle="bold" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#CFDCE9"
+            android:orientation="horizontal" >
+            <TextView
+                android:id="@+id/textViewEstadotxt2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="40dp"
+                android:layout_marginTop="5dp"
+                android:background="#FDFDFD"
+                android:padding="3dp"
+                android:text="@string/compania"
+                android:textColor="#838383"
+                android:textSize="14dp"
+                android:textStyle="bold" />
+		</LinearLayout>
+        <View
+            android:id="@+id/textViewSepusr2122"
+            android:layout_width="wrap_content"
+            android:layout_height="2dp"
+            android:background="#3F8A00" />
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#CFDCE9"
+            android:orientation="horizontal" >
+            
+            <TextView
+                android:id="@+id/textViewNombreContactoLabel1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="3dp"
+                android:text="@string/ncontacto"
+                android:textColor="#838383"
+                android:textSize="14dp"
+                android:textStyle="bold" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#CFDCE9"
+            android:orientation="horizontal" >
+			<TextView
+                android:id="@+id/textViewncasotxt11"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="3dp"
+                android:text="@string/telefono"
+                android:textColor="#838383"
+                android:background="#FDFDFD"
+                android:textSize="14dp"
+                android:textStyle="bold" />
+		</LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#CFDCE9"
+            android:orientation="horizontal" >
+            
+            <TextView
+                android:id="@+id/textViewTelefonoLabel1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="3dp"
+                android:text="@string/telefono"
+                android:textColor="#838383"
+                android:textSize="14dp"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/textViewEstadotxt21"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="3dp"
+                android:layout_marginLeft="5dp"
+                android:text="@string/telefono"
+                android:textColor="#838383"
+                android:background="#FDFDFD"
+                android:textSize="14dp"
+                android:textStyle="bold" />
+            
+        </LinearLayout>
+		<LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#CFDCE9"
+            android:orientation="horizontal" >
+            
+			<TextView
+                android:id="@+id/textViewEstado23"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="3dp"
+                android:text="@string/patente"
+                android:textColor="#838383"
+                android:textSize="14dp"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/textViewEstadotxt23"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="3dp"
+                android:layout_marginLeft="5dp"
+                android:text="@string/patente"
+                android:textColor="#838383"
+                android:background="#FDFDFD"
+                android:textSize="14dp"
+                android:textStyle="bold" />
+            
+        </LinearLayout>
+		<LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#CFDCE9"
+            android:orientation="horizontal" >
+            
+            <TextView
+                android:id="@+id/textViewncaso14"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="3dp"
+                android:text="@string/propuesta"
+                android:textColor="#838383"
+                android:textSize="14dp"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/textViewncasotxt14"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="3dp"
+                android:layout_marginLeft="5dp"
+                android:text="@string/patente"
+                android:textColor="#838383"
+                android:background="#FDFDFD"
+                android:textSize="14dp"
+                android:textStyle="bold" />
+        </LinearLayout>
+		<LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#CFDCE9"
+            android:orientation="horizontal" >
+            
+            <TextView
+                android:id="@+id/textViewEstado24"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="3dp"
+                android:text="@string/poliza"
+                android:textColor="#838383"
+                android:textSize="14dp"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/textViewEstadotxt24"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="3dp"
+                android:layout_marginLeft="5dp"
+                android:text="@string/patente"
+                android:textColor="#838383"
+                android:background="#FDFDFD"
+                android:textSize="14dp"
+                android:textStyle="bold" />
+        </LinearLayout>
+		<LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#CFDCE9"
+            android:orientation="horizontal" >
+            
+            <TextView
+                android:id="@+id/textViewEstado243"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="3dp"
+                android:text="@string/fechayhora"
+                android:textColor="#838383"
+                android:textSize="14dp"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/textViewEstadotxt25"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="3dp"
+                android:layout_marginLeft="5dp"
+                android:text="@string/patente"
+                android:textColor="#838383"
+                android:background="#FDFDFD"
+                android:textSize="14dp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <View
+            android:id="@+id/textViewSepusr211"
+            android:layout_width="wrap_content"
+            android:layout_height="2dp"
+            android:background="#3F8A00" />
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#DDDDDD"
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:id="@+id/imageView13"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="35dp"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/greenball" />
+
+            <TextView
+                android:id="@+id/textViewncaso13"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="3dp"
+                android:text="@string/observacion"
+                android:textColor="#838383"
+                android:textSize="14dp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#CFDCE9"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/textViewncasotxt13"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="40dp"
+                android:layout_marginTop="5dp"
+                android:background="#FDFDFD"
+                android:padding="3dp"
+                android:text="@string/observacion"
+                android:textColor="#838383"
+                android:textSize="14dp"
+                android:textStyle="bold" />
+        </LinearLayout>
+        <View
+            android:id="@+id/textViewSepusr214"
+            android:layout_width="wrap_content"
+            android:layout_height="2dp"
+            android:background="#3F8A00" />
+        
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#DDDDDD"
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:id="@+id/imageView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="35dp"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/greenball" />
+
+            <TextView
+                android:id="@+id/textViewnDireccion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="3dp"
+                android:text="@string/direccion"
+                android:textColor="#838383"
+                android:textSize="14dp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#CFDCE9"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/textViewnDirecciontxt"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="40dp"
+                android:layout_marginTop="5dp"
+                android:background="#FDFDFD"
+                android:padding="3dp"
+                android:text="@string/direccion"
+                android:textColor="#838383"
+                android:textSize="14dp"
+                android:textStyle="bold" />
+            
+        <View
+            android:id="@+id/textViewSepusr3"
+            android:layout_width="2dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="#0A0C29" />
+
+            <ImageView
+                android:id="@+id/imageView4"
+                android:contentDescription="@string/app_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/btn_visitar"
+                android:layout_gravity="center"
+                android:layout_marginLeft="15dp" />
+
+        </LinearLayout>
+        
+        <View
+            android:id="@+id/textViewSepusr4"
+            android:layout_width="wrap_content"
+            android:layout_height="4dp"
+            android:background="#0A0C29" />
+
+</LinearLayout>

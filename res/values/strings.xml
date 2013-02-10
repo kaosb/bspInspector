@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<resources>
+    <string name="hello">Hello World</string>
+    <string name="app_name">BSP Inspector Alpha 44
+</string>
+    <string name="ok">Aceptar</string>
+    <string name="name">Nombre</string>
+    <string name="description">Descripcion</string>
+    <string name="address">Direccion</string>
+    <string name="cod">numero</string>
+    <string name="volver">volver</string>
+    <string name="siguiente">siguiente</string>
+    <string name="rusuario"> REGISTRO DE USUARIO </string>
+    <string name="usuario"> USUARIO </string>
+    <string name="pass"> PASSWORD </string>
+    <string name="recordar"> RECORDAR </string>
+    <string name="OK"> OK </string>
+    <string name="ncaso"> Nº DE INSPECCIÓN</string>
+    <string name="estado"> ESTADO </string>
+    <string name="direccion"> DIRECCIÓN </string>
+    <string name="ncampos"> NUMERO DE CAMPOS </string>
+    <string name="nasegurado"> NOMBRE ASEGURADO </string>
+    <string name="ncontacto"> NOMBRE CONTANCTO </string>
+    <string name="compania"> COMPAÑIA </string>
+    <string name="telefono"> TELEFONO: </string>
+    <string name="patente"> PATENTE: </string>
+    <string name="propuesta"> PROPUESTA: </string>
+    <string name="poliza"> POLIZA: </string>
+    <string name="observacion"> OBSERVACION </string>
+    <string name="fechayhora"> FECHA Y HORA </string>
+</resources>

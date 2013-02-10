@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="spinner_prompt">Selecciona una opción</string>
+    <string-array name="spinner_array">
+		<item>Chartis</item>
+		<item>Liberty</item>
+		<item>Consorcio</item>
+		<item>Security</item>
+		<item>Magallanes</item>
+		<item>Royal</item>
+		<item>Santander</item>
+		<item>Santander_Seguros_Generales</item>
+		<item>HDI Seguros</item>
+		<item>Renta-Nacional</item>
+    </string-array>
+</resources>
