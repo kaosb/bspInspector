@@ -145,7 +145,7 @@ public class formMaker extends Activity {
                 /*BOTONES*/            
                 Button siguiente = new Button(formMaker.this);
                 siguiente.setText("Siguiente");
-                siguiente.setOnClickListener(new View.OnClickListener() {
+                siguiente.setOnClickListener(new View.OnClickListener(){
                 	public void onClick(View v) {
                 		String Data = "";
                 		int childcount = llcont.getChildCount();
@@ -374,7 +374,6 @@ public class formMaker extends Activity {
             		 if(value != null){
             			 edt.setText(value.toString());
             		 }
-            		 
             		 break;
             	 case 2:
 		            		// select
@@ -487,7 +486,6 @@ public class formMaker extends Activity {
             		 if(value != null){
             			 Log.i("Valor Checkbox", String.valueOf(value));
             		 }
-            		 
             		 break;
             	 case 4:
             		 //RadioGroup // radiobutton
