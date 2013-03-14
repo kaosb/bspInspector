@@ -581,44 +581,41 @@ public class formMaker extends Activity {
 	            			 break;
             		 }
             		 if(countauto != 0){
-        			 // cierro el cursor que se uso para obtener el numero de opciones.
-        			 countOptionsauto.close();
-        			 // creo pero no inicializo el array items
-        			 String[] itemsauto;
-
-        			 // Aqui se traspasa los objetos en el Cursor con opciones al array items el cual es entregado al spinner adapter.
-        			 if(optionsauto.moveToFirst()){
-        				 itemsauto = new String[countauto];
-        				 int temp = 0;
-        				 do{
-        					 itemsauto[temp] = optionsauto.getString(0);
-        					 temp++;
-        				 }while(optionsauto.moveToNext() && optionsauto.getPosition() < optionsauto.getCount() );
-        			 }else{
-        				 itemsauto = new String[] {"1","2","3","4"};
-        			 }
-        			 // Cerramos el Cursor que contenia las opciones
-        			 optionsauto.close();
-
-        			 // Texto titulo
-        			 tv.setText(tv.getText()+"\nSelecciona "+c.getString(2));
-        			 
-        			 // Setting del spinner y el adaptador al cual le paso un array con el contendio.
-        			 Spinner selectauto = new Spinner(this);
-        			 selectauto.setId(Integer.parseInt(c.getString(0)));
-        			 selectauto.setTag(2);
-        			 selectauto.setPrompt("Selecciona "+c.getString(2));
-        			 ArrayAdapter<String> adapterauto = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, itemsauto);
-        			 adapterauto.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        			 selectauto.setAdapter(adapterauto);
-        			 //Get saved value
-        			 value = getFieldValue(c.getInt(0));
-        			 if(value != null){
-        				 int pos = this.indexOf(adapterauto, value);
-        				 selectauto.setSelection(pos);
-        			 }
-        			 // Lo agrego a la vista
-        			 cont.addView(selectauto);
+	        			 // cierro el cursor que se uso para obtener el numero de opciones.
+	        			 countOptionsauto.close();
+	        			 // creo pero no inicializo el array items
+	        			 String[] itemsauto;
+	        			 // Aqui se traspasa los objetos en el Cursor con opciones al array items el cual es entregado al spinner adapter.
+	        			 if(optionsauto.moveToFirst()){
+	        				 itemsauto = new String[countauto];
+	        				 int temp = 0;
+	        				 do{
+	        					 itemsauto[temp] = optionsauto.getString(0);
+	        					 temp++;
+	        				 }while(optionsauto.moveToNext() && optionsauto.getPosition() < optionsauto.getCount() );
+	        			 }else{
+	        				 itemsauto = new String[] {"1","2","3","4"};
+	        			 }
+	        			 // Cerramos el Cursor que contenia las opciones
+	        			 optionsauto.close();
+	        			 // Texto titulo
+	        			 tv.setText(tv.getText()+"\nSelecciona "+c.getString(2));
+	        			 // Setting del spinner y el adaptador al cual le paso un array con el contendio.
+	        			 Spinner selectauto = new Spinner(this);
+	        			 selectauto.setId(Integer.parseInt(c.getString(0)));
+	        			 selectauto.setTag(2);
+	        			 selectauto.setPrompt("Selecciona "+c.getString(2));
+	        			 ArrayAdapter<String> adapterauto = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, itemsauto);
+	        			 adapterauto.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+	        			 selectauto.setAdapter(adapterauto);
+	        			 //Get saved value
+	        			 value = getFieldValue(c.getInt(0));
+	        			 if(value != null){
+	        				 int pos = this.indexOf(adapterauto, value);
+	        				 selectauto.setSelection(pos);
+	        			 }
+	        			 // Lo agrego a la vista
+	        			 cont.addView(selectauto);
             		 }
             		 break;
             	 case 9:
