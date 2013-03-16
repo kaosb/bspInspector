@@ -2,10 +2,12 @@ package com.bspinspector;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -21,8 +23,10 @@ import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Adapter;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -599,32 +603,51 @@ public class formMaker extends Activity {
 	        			 // Cerramos el Cursor que contenia las opciones
 	        			 optionsauto.close();
 	        			 // Texto titulo
-	        			 tv.setText(tv.getText()+"\nSelecciona "+c.getString(2));
-	        			 // Setting del spinner y el adaptador al cual le paso un array con el contendio.
-	        			 Spinner selectauto = new Spinner(this);
-	        			 selectauto.setId(Integer.parseInt(c.getString(0)));
-	        			 selectauto.setTag(2);
-	        			 selectauto.setPrompt("Selecciona "+c.getString(2));
+	        			 tv.setText(tv.getText()+"\nIngresa "+c.getString(2));
+	        			 // Autocomplete
+	        			 AutoCompleteTextView txtmarcaauto = new AutoCompleteTextView(this);
+	        			 txtmarcaauto.setId(Integer.parseInt(c.getString(0)));
+	        			 // Seteamos el tag como flag para identificar el tipo de campo durante el barrido al momento de almacenar datos.
+	        			 txtmarcaauto.setTag(8);
+	        			 // Adaptador para el contenido de la consulta pasarlo al autocomplete.
 	        			 ArrayAdapter<String> adapterauto = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, itemsauto);
-	        			 adapterauto.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-	        			 selectauto.setAdapter(adapterauto);
-	        			 //Get saved value
+	        			 // Incorporo el adaptador
+	        			 txtmarcaauto.setAdapter(adapterauto);
+	        			 // Obtengo el valor almacenado en la BD
 	        			 value = getFieldValue(c.getInt(0));
+	        			 // Si el valor es distinto de null setea el valor almacenado en la BD
 	        			 if(value != null){
-	        				 int pos = this.indexOf(adapterauto, value);
-	        				 selectauto.setSelection(pos);
+	        				 txtmarcaauto.setText(value);
 	        			 }
-	        			 // Lo agrego a la vista
-	        			 cont.addView(selectauto);
+	        			 // Agrga el elemento a la vista
+	        			 cont.addView(txtmarcaauto);
             		 }
             		 break;
             	 case 9:
             		 // textedit fecha
             		 tv.setText(tv.getText()+"\nIngresa "+c.getString(2));
-            		 EditText edtf = new EditText(this);
+            		 final EditText edtf = new EditText(this);
             		 edtf.setId(Integer.parseInt(c.getString(0)));
             		 edtf.setTag(9);
             		 edtf.setInputType(InputType.TYPE_DATETIME_VARIATION_NORMAL);
+            		 edtf.setOnClickListener(new View.OnClickListener() {
+						public void onClick(View v) {
+					        // Use the current date as the default date in the picker
+					        final Calendar c = Calendar.getInstance();
+					        int year = c.get(Calendar.YEAR);
+					        int month = c.get(Calendar.MONTH);
+					        int day = c.get(Calendar.DAY_OF_MONTH);
+					        DatePickerDialog.OnDateSetListener mDateSetListener = new DatePickerDialog.OnDateSetListener(){
+					        	public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth){
+					        		edtf.setText(String.valueOf(dayOfMonth)+"-"+String.valueOf(monthOfYear)+"-"+String.valueOf(year));
+					        	}
+					        };
+							// Create a new instance of DatePickerDialog and return it
+					        DatePickerDialog fecha = new DatePickerDialog(formMaker.this, mDateSetListener, year, month, day);
+					        fecha.show();
+						}
+            		 });
+            		 
             		 cont.addView(edtf);
             		 
             		 break;
