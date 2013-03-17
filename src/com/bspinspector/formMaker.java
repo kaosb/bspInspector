@@ -219,7 +219,7 @@ public class formMaker extends Activity {
     	               				break;
     	               				
     	               			case 4:
-    	               				// TODO Hay que hacer que esta shit funcione
+    	               				// TODO Hay que hacer que esta shit funcione 
     	               				RadioGroup rbg = (RadioGroup) findViewById(Integer.parseInt(id));
     	               				Data= Data+label+": "+rbg.getCheckedRadioButtonId()/100+"\n";
     	               				//saveFieldValue(Integer.parseInt(id),"");
