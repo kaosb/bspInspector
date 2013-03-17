@@ -95,7 +95,6 @@ public final class R {
         public static final int textViewncasotxt11=0x7f06002d;
         public static final int textViewncasotxt13=0x7f06003b;
         public static final int textViewncasotxt14=0x7f060033;
-        public static final int txtTest=0x7f060042;
     }
     public static final class layout {
         public static final int dashboard=0x7f030000;

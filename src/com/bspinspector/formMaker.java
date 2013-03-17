@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.InputType;
+import android.text.method.DigitsKeyListener;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -45,7 +46,6 @@ import android.widget.Toast;
 
 public class formMaker extends Activity {
 	
-	protected Button _button;
 	protected ImageView _image;
 	protected TextView _field;
 	protected String _path;
@@ -191,24 +191,35 @@ public class formMaker extends Activity {
     	               			case 1:
     	               				EditText redtt = (EditText) findViewById(Integer.parseInt(id));
     	               				Data= Data+label+": "+redtt.getText()+"\n";
-    	               				saveFieldValue(Integer.parseInt(id),redtt.getText().toString());
+    	               				if(redtt.getText().toString().length()>0){
+    	               					saveFieldValue(Integer.parseInt(id), redtt.getText().toString());
+    	               				}else{
+    	               					saveFieldValue(Integer.parseInt(id), "NULL");
+    	               				}
     	               				break;
                    				
     	               			case 2:
     	               				Spinner spinner = (Spinner) findViewById(Integer.parseInt(id));
     	               				Data= Data+label+": "+spinner.getSelectedItem()+"\n";
-    	               				saveFieldValue(Integer.parseInt(id),spinner.getSelectedItem().toString());
+    	               				if(!spinner.getSelectedItem().toString().equals("")){
+    	               					saveFieldValue(Integer.parseInt(id), spinner.getSelectedItem().toString());
+    	               				}else{
+    	               					saveFieldValue(Integer.parseInt(id), "NULL");
+    	               				}
     	               				break;
     	               				
     	               			case 3:
-    	               				CheckBox checkbox = (CheckBox) findViewById(Integer.parseInt(id));
-    	               				if(checkbox.isChecked()){
+    	               				final CheckBox checkbox = (CheckBox) findViewById(Integer.parseInt(id));
+    	               				if(checkbox != null && checkbox.isChecked()){
     	               					Data= Data+label+": "+checkbox.getId()+"\n";
-    	               					saveFieldValue(Integer.parseInt(id),"chek".toString());
+    	               					saveFieldValue(Integer.parseInt(id), "chek".toString());
+    	               				}else{
+    	               					saveFieldValue(Integer.parseInt(id), "NULL");
     	               				}
     	               				break;
     	               				
     	               			case 4:
+    	               				// TODO Hay que hacer que esta shit funcione
     	               				RadioGroup rbg = (RadioGroup) findViewById(Integer.parseInt(id));
     	               				Data= Data+label+": "+rbg.getCheckedRadioButtonId()/100+"\n";
     	               				//saveFieldValue(Integer.parseInt(id),"");
@@ -217,30 +228,38 @@ public class formMaker extends Activity {
     	               			case 5:
     	               				EditText redtn = (EditText) findViewById(Integer.parseInt(id));
     	               				Data= Data+label+": "+redtn.getText()+"\n";
-    	               				saveFieldValue(Integer.parseInt(id),redtn.getText().toString());
+    	               				if(redtn.getText().toString().length()>0){
+    	               					saveFieldValue(Integer.parseInt(id), redtn.getText().toString());
+    	               				}else{
+    	               					saveFieldValue(Integer.parseInt(id), "NULL");
+    	               				}
     	               				break;
     	               				
     	               			case 6:
     	               				EditText redte = (EditText) findViewById(Integer.parseInt(id));
     	               				Data= Data+label+": "+redte.getText()+"\n";
-    	               				saveFieldValue(Integer.parseInt(id),redte.getText().toString());
+    	               				if(redte.getText().toString().length()>0){
+    	               					saveFieldValue(Integer.parseInt(id), redte.getText().toString());
+    	               				}else{
+    	               					saveFieldValue(Integer.parseInt(id), "NULL");
+    	               				}
     	               				break;
     	               				
     	               			case 7:
     	               				EditText redtr = (EditText) findViewById(Integer.parseInt(id));
     	               				Data= Data+label+": "+redtr.getText()+"\n";
-    	               				saveFieldValue(Integer.parseInt(id),redtr.getText().toString());
-
+    	               				if(redtr.getText().toString().length()>0){
+    	               					saveFieldValue(Integer.parseInt(id), redtr.getText().toString());
+    	               				}else{
+    	               					saveFieldValue(Integer.parseInt(id), "NULL");
+    	               				}
     	               				break;
     	
     	               			default:
-    	               				EditText redtd = (EditText) findViewById(Integer.parseInt(id));
     	               				try{
-    	               					Data= Data+"\n"+label+": "+redtd.getText();
-    	               					//saveFieldValue(Integer.parseInt(id),redtd.getText().toString());
+    	               					saveFieldValue(Integer.parseInt(id), "NULL");
     	               				}catch(Exception e){
-    	               					Data= Data+label+": "+"cuack"+"\n";
-    	               					//saveFieldValue(Integer.parseInt(id),"cuack");
+    	               					Log.i("Error al capturar", e.getMessage());
     	               				}
     	               				break;
                 		      }
@@ -380,6 +399,20 @@ public class formMaker extends Activity {
             	 String value;
             	 /*Campo*/
             	 Log.i("Aqui",""+Integer.parseInt(c.getString(3)));
+            	 
+            	/* if(c.getString(4)!=null){
+            		 Log.i("Este es dependiente", c.getString(4));
+            		 EditText instancia = (EditText) cont.findViewById(Integer.parseInt(c.getString(4)));
+            		 final String tag = c.getString(0);
+            		 instancia.setOnClickListener(new View.OnClickListener() {
+						public void onClick(View v) {
+							// TODO Es necesario hacer los campos que poseen cantidades grandes de datos dependientes.
+							Toast.makeText(formMaker.this, "Aqui deberia ocurrir algo en: "+ tag, Toast.LENGTH_LONG).show();
+						}
+            			 
+            		 });
+            	 }*/
+            	 
             	 switch(Integer.parseInt(c.getString(3))){
             	 
             	 case 1:
@@ -396,47 +429,25 @@ public class formMaker extends Activity {
             		 }
             		 break;
             	 case 2:
-		            		// select
-            		 		// Mantiene el contador sobre la cantidad de opciones de cada select ya sea para los casos especiales o los genericos.
-            		 		Cursor countOptions = null;
             		 		// Mantiene las opciones que seran entragadas al spinner
             		 		Cursor options = null;
             		 		// Contador auxiliar que se usa en los bucles para paginar segun lo configurado.
             		 		int count = 0;
             		 		switch(Integer.parseInt(c.getString(0))){
             		 		case 3:
-            		 			// Consultamos la tabla regiones
-            		 			// Contamos la cantidad de opciones que posee el input
-            		 			countOptions = db.rawQuery("SELECT COUNT(*) FROM region WHERE nombreRegion NOTNULL", null);
-            		 			countOptions.moveToFirst();
-            		 			count= countOptions.getInt(0);
-            		 			// Consultamos las opciones asociadas al input
-            		 			options = db.rawQuery("SELECT nombreRegion FROM region WHERE nombreRegion NOTNULL",null);
+            		 			options = getCustomFieldDataContent(db, "region", "nombreRegion");
+            		 			count = options.getCount();
             		 			break;
             		 		case 4:
-            		 			// Consultamos la tabla comunas
-            		 			// Contamos la cantidad de opciones que posee el input
-            		 			countOptions = db.rawQuery("SELECT COUNT(*) FROM comuna WHERE nombreComuna NOTNULL", null);
-            		 			countOptions.moveToFirst();
-            		 			count= countOptions.getInt(0);
-            		 			// Consultamos las opciones asociadas al input
-            		 			options = db.rawQuery("SELECT nombreComuna FROM comuna WHERE nombreComuna NOTNULL",null);
+            		 			options = getCustomFieldDataContent(db, "comuna", "nombreComuna");
+            		 			count = options.getCount();
             		 			break;
             		 		case 19:
-            		 			// Consultamos la tabla tipos de vehiculo
-            		 			// Contamos la cantidad de opciones que posee el input
-            		 			countOptions = db.rawQuery("SELECT COUNT(*) FROM tipos_vehiculo WHERE tipo NOTNULL", null);
-            		 			countOptions.moveToFirst();
-            		 			count= countOptions.getInt(0);
-            		 			// Consultamos las opciones asociadas al input
-            		 			options = db.rawQuery("SELECT tipo FROM tipos_vehiculo WHERE tipo NOTNULL",null);
+            		 			options = getCustomFieldDataContent(db, "tipos_vehiculo", "tipo");
+            		 			count = options.getCount();
             		 			break;
             		 		default:
             		 			// Consulto BD Con options
-            		 			// Contamos la cantidad de opciones que posee el input
-            		 			countOptions = db.rawQuery("SELECT COUNT(*) FROM option WHERE status = 0 AND input = "+c.getString(0), null);
-            		 			if(countOptions.moveToFirst()){
-	            		 			count= countOptions.getInt(0);
 	            		 			// Consultamos las opciones asociadas al input
 	            		 			String[] args1 = new String[] {"0",c.getString(0)};
 	            		 			options = db.query("option",
@@ -446,11 +457,9 @@ public class formMaker extends Activity {
 	            		 					null,
 	            		 					null,
 	            		 					null);
-            		 			}
+	            		 			count = options.getCount();
             		 			break;
             		 		}
-            		 		// cierro el cursor que se uso para obtener el numero de opciones.
-		            		countOptions.close();
 		            		// creo pero no inicializo el array items
 		                	String[] items;
 		                	
@@ -496,16 +505,17 @@ public class formMaker extends Activity {
 		                	break;
             	 case 3:
             		 //checkbox
-            		 tv.setText(tv.getText()+"\nEs "+c.getString(2));
+            		 tv.setText(tv.getText()+"\n"+c.getString(2));
             		 CheckBox checkBox = new CheckBox(this);
             		 checkBox.setId(Integer.parseInt(c.getString(0)));
             		 checkBox.setTag(3);
-            		 //Todo el codigo para manejar el checkbox
-            		 cont.addView(checkBox);
+            		 // Obtenemos el valor guardado en la Base de datos
             		 value = getFieldValue(c.getInt(0));
-            		 if(value != null){
-            			 Log.i("Valor Checkbox", String.valueOf(value));
+            		 // Validamos que el valor corresponda a un check.
+            		 if(value != null && value.equals("chek")){
+            			 checkBox.setChecked(true);
             		 }
+            		 cont.addView(checkBox);
             		 break;
             	 case 4:
             		 //RadioGroup // radiobutton
@@ -564,7 +574,8 @@ public class formMaker extends Activity {
             		 EditText edtr = new EditText(this);
             		 edtr.setTag(7);
             		 edtr.setId(Integer.parseInt(c.getString(0)));
-            		 edtr.setInputType(InputType.TYPE_CLASS_TEXT);
+            		 edtr.setInputType(InputType.TYPE_CLASS_NUMBER);
+            		 edtr.setKeyListener(DigitsKeyListener.getInstance("0123456789.-"));;
             		 cont.addView(edtr);
             		 value = getFieldValue(c.getInt(0));
             		 if(value != null){
@@ -573,36 +584,20 @@ public class formMaker extends Activity {
             		 
             		 break;
             	 case 8:
-        			 // Mantiene el contador sobre la cantidad de opciones de cada select ya sea para los casos especiales o los genericos.
-            		 Cursor countOptionsauto = null;
             		 // Mantiene las opciones que seran entragadas al spinner
             		 Cursor optionsauto = null;
             		 int countauto = 0;
             		 switch(Integer.parseInt(c.getString(0))){
 	            		 case 23:
-	            			 // Marca
-	            			 // Consultamos la tabla marcas
-	            			 // Contamos la cantidad de opciones que posee la tabla
-	            			 countOptionsauto = db.rawQuery("SELECT COUNT(*) FROM marcas WHERE nombreMarca NOTNULL", null);
-	            			 countOptionsauto.moveToFirst();
-	            			 countauto = countOptionsauto.getInt(0);
-	            			 // Consultamos las opciones asociadas al input
-	            			 optionsauto = db.rawQuery("SELECT nombreMarca FROM marcas WHERE nombreMarca NOTNULL",null);
+	            			 optionsauto = getCustomFieldDataContent(db, "marcas", "nombreMarca");
+	            			 countauto = optionsauto.getCount();
 	            			 break;
 	            		 case 24:
-	            			 // Modelo
-	            			 // Consultamos la tabla modelo
-	            			 // Contamos la cantidad de opciones que posee la tabla
-	            			 countOptionsauto = db.rawQuery("SELECT COUNT(*) FROM modelos WHERE nombreModelo NOTNULL", null);
-	            			 countOptionsauto.moveToFirst();
-	            			 countauto = countOptionsauto.getInt(0);
-	            			 // Consultamos las opciones asociadas al input
-	            			 optionsauto = db.rawQuery("SELECT nombreModelo FROM modelos WHERE nombreModelo NOTNULL",null);
+	            			 optionsauto = getCustomFieldDataContent(db, "modelos", "nombreModelo");
+	            			 countauto = optionsauto.getCount();
 	            			 break;
             		 }
             		 if(countauto != 0){
-	        			 // cierro el cursor que se uso para obtener el numero de opciones.
-	        			 countOptionsauto.close();
 	        			 // creo pero no inicializo el array items
 	        			 String[] itemsauto;
 	        			 // Aqui se traspasa los objetos en el Cursor con opciones al array items el cual es entregado al spinner adapter.
@@ -762,27 +757,30 @@ public class formMaker extends Activity {
         
         Cursor count = dbTarget.rawQuery("SELECT COUNT(*) FROM dataInProgress WHERE idInput =" + fieldID + " AND idCase=" + cod_ubicacion, null);
         
-        int resp = 0;
         ContentValues newValues = new ContentValues();
-        
         count.moveToFirst();
-        Log.i("COUNT", ""+count.getInt(0)+"/"+count.getPosition());
         if(count.getInt(0)>0){
-    		newValues.put("value", value);
-    		newValues.put("update_at", date);
-    		resp = dbTarget.update("dataInProgress", newValues, "idInput =" + fieldID + " AND idCase=" + cod_ubicacion, null);
-    		Log.i("rows actualizadas: ", ""+resp);
+        	if(value.equals("NULL")){
+        		// elimino el row para mantener la consistencia de la persistencia de datos.
+        		dbTarget.delete("dataInProgress","idInput =" + fieldID + " AND idCase=" + cod_ubicacion, null);
+        	}else{
+        		// actualizamos el row para mantener la consistencia de la persistencia de datos.
+        		newValues.put("value", value);
+        		newValues.put("update_at", date);
+        		dbTarget.update("dataInProgress", newValues, "idInput =" + fieldID + " AND idCase=" + cod_ubicacion, null);
+        	}
         }else{
-    		newValues.put("idCase", cod_ubicacion);
-    		newValues.put("idInput", fieldID);
-    		newValues.put("value", value);
-    		newValues.put("update_at", date);
-        	resp = (int) dbTarget.insert("dataInProgress", null, newValues);
-        	Log.i("rows insert: ", ""+resp);
+        	// insertamos un nuevo row para mantener persistencia de datos.
+        	if(!value.equals("NULL")){
+        		newValues.put("idCase", cod_ubicacion);
+        		newValues.put("idInput", fieldID);
+        		newValues.put("value", value);
+        		newValues.put("update_at", date);
+            	dbTarget.insert("dataInProgress", null, newValues);
+        	}
         }
         count.close();
         dbTarget.close();
-        
 	}
 	
 	/**
@@ -818,11 +816,32 @@ public class formMaker extends Activity {
 	}
 	
 	/**
+	 * getCustomDataContent
+	 * funcion que obtiene datos de un campo especifico de la tabla especificada y retorna un cursos con la informacion respectiva.
+	 * @return 
+	 */
+	public Cursor getCustomFieldDataContent(SQLiteDatabase db, String tableName, String fieldName){
+		Cursor data = null;
+		data = db.rawQuery("SELECT "+fieldName+" FROM "+tableName+" WHERE "+fieldName+" NOTNULL",null);
+		return data;
+	}
+	
+	/**
+	 * getTableDataContent
+	 * funcion que obtiene toda la informacion de la tabla especificada.
+	 * @return 
+	 */
+	public Cursor getTableDataContent(SQLiteDatabase db, String tableName){
+		Cursor data = null;
+		data = db.rawQuery("SELECT * FROM "+tableName, null);
+		return data;
+	}
+	
+	/**
 	 * photoPicker
 	 * Funciones para capturar imagenes.
 	 * */
-    
-    @Override
+	@Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) 
     {	
     	Log.i( "MakeMachine", "resultCode: " + resultCode );
@@ -837,7 +856,6 @@ public class formMaker extends Activity {
     			break;
     	}
     }
-    
     protected void onPhotoTaken()
     {
     	Log.i( "MakeMachine", "onPhotoTaken" );
@@ -852,7 +870,6 @@ public class formMaker extends Activity {
     	
     	_field.setVisibility( View.GONE );
     }
-    
     @Override 
     protected void onRestoreInstanceState( Bundle savedInstanceState){
     	Log.i( "MakeMachine", "onRestoreInstanceState()");
@@ -860,7 +877,6 @@ public class formMaker extends Activity {
     		onPhotoTaken();
     	}
     }
-    
     @Override
     protected void onSaveInstanceState( Bundle outState ) {
     	outState.putBoolean( formMaker.PHOTO_TAKEN, _taken );
