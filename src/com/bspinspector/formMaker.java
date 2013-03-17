@@ -10,12 +10,18 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
@@ -28,6 +34,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -37,6 +44,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class formMaker extends Activity {
+	
+	protected Button _button;
+	protected ImageView _image;
+	protected TextView _field;
+	protected String _path;
+	protected boolean _taken;
+	
+	protected static final String PHOTO_TAKEN	= "photo_taken";
 	
 	private String user;
 	private String cod_ubicacion;
@@ -215,6 +230,7 @@ public class formMaker extends Activity {
     	               				EditText redtr = (EditText) findViewById(Integer.parseInt(id));
     	               				Data= Data+label+": "+redtr.getText()+"\n";
     	               				saveFieldValue(Integer.parseInt(id),redtr.getText().toString());
+
     	               				break;
     	
     	               			default:
@@ -654,10 +670,23 @@ public class formMaker extends Activity {
             	 case 10:
             		 // textedit imagen
             		 tv.setText(tv.getText()+"\nToma "+c.getString(2));
-            		 EditText edti = new EditText(this);
+            		 final EditText edti = new EditText(this);
             		 edti.setId(Integer.parseInt(c.getString(0)));
             		 edti.setTag(10);
-            		 edti.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+            		 edti.setInputType(InputType.TYPE_TEXT_VARIATION_NORMAL);
+            		 edti.setOnClickListener(new View.OnClickListener() {
+						public void onClick(View v){
+							Toast.makeText(formMaker.this, "Aproach preliminar de la funcionalidad de captura de imagenes.", Toast.LENGTH_LONG).show();
+							_path = Environment.getExternalStorageDirectory() + "/images/make_machine_example.jpg";
+							_field = edti;
+					    	File file = new File( _path );
+					    	Uri outputFileUri = Uri.fromFile( file );
+					    	Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE );
+					    	
+					    	intent.putExtra( MediaStore.EXTRA_OUTPUT, outputFileUri );
+					    	startActivityForResult( intent, 0 );
+						}
+            		 });
             		 cont.addView(edti);
             		 
             		 break;
@@ -787,5 +816,54 @@ public class formMaker extends Activity {
         db.execSQL(SQL2);
         return db;
 	}
+	
+	/**
+	 * photoPicker
+	 * Funciones para capturar imagenes.
+	 * */
+    
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) 
+    {	
+    	Log.i( "MakeMachine", "resultCode: " + resultCode );
+    	switch( resultCode )
+    	{
+    		case 0:
+    			Log.i( "MakeMachine", "User cancelled" );
+    			break;
+    			
+    		case -1:
+    			onPhotoTaken();
+    			break;
+    	}
+    }
+    
+    protected void onPhotoTaken()
+    {
+    	Log.i( "MakeMachine", "onPhotoTaken" );
+    	_taken = true;
+    	
+    	BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 4;
+    	
+    	Bitmap bitmap = BitmapFactory.decodeFile( _path, options );
+    	
+    	_image.setImageBitmap(bitmap);
+    	
+    	_field.setVisibility( View.GONE );
+    }
+    
+    @Override 
+    protected void onRestoreInstanceState( Bundle savedInstanceState){
+    	Log.i( "MakeMachine", "onRestoreInstanceState()");
+    	if( savedInstanceState.getBoolean( formMaker.PHOTO_TAKEN ) ) {
+    		onPhotoTaken();
+    	}
+    }
+    
+    @Override
+    protected void onSaveInstanceState( Bundle outState ) {
+    	outState.putBoolean( formMaker.PHOTO_TAKEN, _taken );
+    }
 	
 }
