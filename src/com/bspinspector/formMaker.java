@@ -5,6 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
@@ -104,7 +106,6 @@ public class formMaker extends Activity {
         	// Descargamos la BD con el form si es distinta a la version que tenemos.
             Downloader dw = new Downloader();
             dbfile = dw.getDB();
-            
             //Consulta que obtiene los settings
             File dbConfFile = getdDBFile();
             if(dbConfFile.exists()){
@@ -133,7 +134,6 @@ public class formMaker extends Activity {
     	        dbConf.close();
             }
             
-            
             // Si tenemos la bd maestra para los forms entramos a consultarla
             if(dbfile.exists()){
                 /*Crear Vista*/
@@ -161,128 +161,183 @@ public class formMaker extends Activity {
     	            llcont.setOrientation(LinearLayout.VERTICAL);
     	            ll.addView(llcont);                
                 
-                /*BOTONES*/            
+    	        /**
+    	         * ########### BOTONES
+    	         */           
                 Button siguiente = new Button(formMaker.this);
                 siguiente.setText("Siguiente");
                 siguiente.setOnClickListener(new View.OnClickListener(){
-                	public void onClick(View v) {
-                		String Data = "";
-                		int childcount = llcont.getChildCount();
-                		
-                		for (int i=0; i < childcount; i++){
-                		      View vista = llcont.getChildAt(i);
-                		      LinearLayout lltemp = (LinearLayout) vista;
-                		      Log.i("TAG:", "PreguntaID->"+llcont.getChildAt(i).getTag()+" FieldType:"+llcont.getChildAt(1).getTag());
-                		      
-                		      String id = (String) llcont.getChildAt(i).getTag();
-                		      // Que pasa cuando viene un checkbox??????
-                		      // Este id al parecer no viene
-                		      int type = 0;
-                		      try{
-                		    	  type = (Integer) lltemp.getChildAt(1).getTag();
-                		      }catch(Exception e){
-                		    	  type = 3;
-                		      }
-                		      TextView txtTemp = (TextView) lltemp.getChildAt(0);
-                		      String label = (String) txtTemp.getText();
-                		      
-                		      switch(type){
-                  			
-    	               			case 1:
-    	               				EditText redtt = (EditText) findViewById(Integer.parseInt(id));
-    	               				Data= Data+label+": "+redtt.getText()+"\n";
-    	               				if(redtt.getText().toString().length()>0){
-    	               					saveFieldValue(Integer.parseInt(id), redtt.getText().toString());
-    	               				}else{
-    	               					saveFieldValue(Integer.parseInt(id), "NULL");
-    	               				}
-    	               				break;
-                   				
-    	               			case 2:
-    	               				Spinner spinner = (Spinner) findViewById(Integer.parseInt(id));
-    	               				Data= Data+label+": "+spinner.getSelectedItem()+"\n";
-    	               				if(!spinner.getSelectedItem().toString().equals("")){
-    	               					saveFieldValue(Integer.parseInt(id), spinner.getSelectedItem().toString());
-    	               				}else{
-    	               					saveFieldValue(Integer.parseInt(id), "NULL");
-    	               				}
-    	               				break;
-    	               				
-    	               			case 3:
-    	               				final CheckBox checkbox = (CheckBox) findViewById(Integer.parseInt(id));
-    	               				if(checkbox != null && checkbox.isChecked()){
-    	               					Data= Data+label+": "+checkbox.getId()+"\n";
-    	               					saveFieldValue(Integer.parseInt(id), "chek".toString());
-    	               				}else{
-    	               					saveFieldValue(Integer.parseInt(id), "NULL");
-    	               				}
-    	               				break;
-    	               				
-    	               			case 4:
-    	               				// TODO Hay que hacer que esta shit funcione 
-    	               				RadioGroup rbg = (RadioGroup) findViewById(Integer.parseInt(id));
-    	               				Data= Data+label+": "+rbg.getCheckedRadioButtonId()/100+"\n";
-    	               				//saveFieldValue(Integer.parseInt(id),"");
-    	               				break;
-    	               				
-    	               			case 5:
-    	               				EditText redtn = (EditText) findViewById(Integer.parseInt(id));
-    	               				Data= Data+label+": "+redtn.getText()+"\n";
-    	               				if(redtn.getText().toString().length()>0){
-    	               					saveFieldValue(Integer.parseInt(id), redtn.getText().toString());
-    	               				}else{
-    	               					saveFieldValue(Integer.parseInt(id), "NULL");
-    	               				}
-    	               				break;
-    	               				
-    	               			case 6:
-    	               				EditText redte = (EditText) findViewById(Integer.parseInt(id));
-    	               				Data= Data+label+": "+redte.getText()+"\n";
-    	               				if(redte.getText().toString().length()>0){
-    	               					saveFieldValue(Integer.parseInt(id), redte.getText().toString());
-    	               				}else{
-    	               					saveFieldValue(Integer.parseInt(id), "NULL");
-    	               				}
-    	               				break;
-    	               				
-    	               			case 7:
-    	               				EditText redtr = (EditText) findViewById(Integer.parseInt(id));
-    	               				Data= Data+label+": "+redtr.getText()+"\n";
-    	               				if(redtr.getText().toString().length()>0){
-    	               					saveFieldValue(Integer.parseInt(id), redtr.getText().toString());
-    	               				}else{
-    	               					saveFieldValue(Integer.parseInt(id), "NULL");
-    	               				}
-    	               				break;
-    	
-    	               			default:
-    	               				try{
-    	               					saveFieldValue(Integer.parseInt(id), "NULL");
-    	               				}catch(Exception e){
-    	               					Log.i("Error al capturar", e.getMessage());
-    	               				}
-    	               				break;
-                		      }
-       
-                		}
-                		
-                		Toast.makeText(formMaker.this, "Se acaban de guardar en tu equipo los siguientes datos:\n"+Data, Toast.LENGTH_SHORT).show();
-        	        	SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbfile, null);
-        	            //Trabajar con la BD
-        	            	String[] args = new String[] {"0", sectionId};
-        	            	Cursor c = db.query("input",
-        	            						new String [] {"id", "section", "name", "type", "dep", "status"},
-        	            						"status = ? AND section = ?",
-        	            						args,
-        	            						null,
-        	            						null,
-        	            						null);
-        	            llcont.removeAllViews();
-        	            crearFormulario(c,db,itemspp,itemcount);
-        	            
-        	        c.close();
-                    db.close();
-                	}
+                    public void onClick(View v){
+                    	Boolean passport = true;
+                    	String Data = "";
+                    	int childcount = llcont.getChildCount();
+                    	for (int i=0; i < childcount; i++){
+                    		View vista = llcont.getChildAt(i);
+                    		LinearLayout lltemp = (LinearLayout) vista;
+                    		Log.i("TAG:", "PreguntaID->"+llcont.getChildAt(i).getTag()+" FieldType:"+llcont.getChildAt(1).getTag());
+                    		String id = (String) llcont.getChildAt(i).getTag();
+                    		// Que pasa cuando viene un checkbox??????
+                    		// Este id al parecer no viene
+                    		int type = 0;
+                    		try{
+                    			type = (Integer) lltemp.getChildAt(1).getTag();
+                    		}catch(Exception e){
+                    			type = 3;
+                    		}
+                    		TextView txtTemp = (TextView) lltemp.getChildAt(0);
+                    		String label = (String) txtTemp.getText();
+                    		switch(type){
+                    		case 1:
+                    			EditText redtt = (EditText) findViewById(Integer.parseInt(id));
+                    			Data= Data+label+": "+redtt.getText()+"\n";
+                    			if(redtt.getText().toString().length()>0){
+                    				saveFieldValue(Integer.parseInt(id), redtt.getText().toString());
+                    			}else{
+                    				saveFieldValue(Integer.parseInt(id), "NULL");
+                    			}
+                    			break;
+
+                    		case 2:
+                    			Spinner spinner = (Spinner) findViewById(Integer.parseInt(id));
+                    			Data= Data+label+": "+spinner.getSelectedItem()+"\n";
+                    			if(!spinner.getSelectedItem().toString().equals("")){
+                    				saveFieldValue(Integer.parseInt(id), spinner.getSelectedItem().toString());
+                    			}else{
+                    				saveFieldValue(Integer.parseInt(id), "NULL");
+                    			}
+                    			break;
+
+                    		case 3:
+                    			final CheckBox checkbox = (CheckBox) findViewById(Integer.parseInt(id));
+                    			if(checkbox != null && checkbox.isChecked()){
+                    				Data= Data+label+": "+checkbox.getId()+"\n";
+                    				saveFieldValue(Integer.parseInt(id), "chek".toString());
+                    			}else{
+                    				saveFieldValue(Integer.parseInt(id), "NULL");
+                    			}
+                    			break;
+
+                    		case 4:
+                    			// TODO Hay que hacer que esta shit funcione 
+                    			RadioGroup rbg = (RadioGroup) findViewById(Integer.parseInt(id));
+                    			Data= Data+label+": "+rbg.getCheckedRadioButtonId()/100+"\n";
+                    			//saveFieldValue(Integer.parseInt(id),"");
+                    			break;
+
+                    		case 5:
+                    			EditText redtn = (EditText) findViewById(Integer.parseInt(id));
+                    			Data= Data+label+": "+redtn.getText()+"\n";
+                    			if(redtn.getText().toString().length()>0){
+                    				saveFieldValue(Integer.parseInt(id), redtn.getText().toString());
+                    			}else{
+                    				saveFieldValue(Integer.parseInt(id), "NULL");
+                    			}
+                    			break;
+
+                    		case 6:
+                    			// Correo electronico
+                    			EditText redte = (EditText) findViewById(Integer.parseInt(id));
+                    			Data= Data+label+": "+redte.getText()+"\n";
+                    			if(redte.getText().toString().length()>0){
+                    				if(validateEmailAddress(redte.getText().toString())){
+                    				saveFieldValue(Integer.parseInt(id), redte.getText().toString());
+                    				}else{
+                        				passport = false;
+                        				redte.setError("Correo electronico invalido.");
+                    				}
+                    			}else{
+                    				saveFieldValue(Integer.parseInt(id), "NULL");
+                    			}
+                    			break;
+
+                    		case 7:
+                    			EditText redtr = (EditText) findViewById(Integer.parseInt(id));
+                    			Data= Data+label+": "+redtr.getText()+"\n";
+                    			if(redtr.getText().toString().length()>0){
+                    				// Creamos un arreglo con el rut y el digito verificador
+                    				String[] rut_dv = redtr.getText().toString().split("-");
+                    				// Las partes del rut (numero y dv) deben tener una longitud positiva
+                    				if(rut_dv.length == 2){
+                    					int rut = Integer.parseInt( rut_dv[0]);
+                    					char dv = rut_dv[1].charAt(0);
+                    					// Validamos que sea un rut valido según la norma
+                    					if (ValidarRut(rut, dv)){
+                    						saveFieldValue(Integer.parseInt(id), redtr.getText().toString());
+                    					}else{
+                    						passport = false;
+                    						redtr.setError("RUT invalido.");
+                    					}
+                    				}else{
+                						passport = false;
+                						redtr.setError("RUT invalido.");
+                    				}
+                    			}else{
+                    				saveFieldValue(Integer.parseInt(id), "NULL");
+                    			}
+                    			break;
+                    			
+                    		case 12:
+                    			// telefono
+                    			EditText redtph = (EditText) findViewById(Integer.parseInt(id));
+                    			Data= Data+label+": "+redtph.getText()+"\n";
+                    			if(redtph.getText().toString().length()>0){
+                    				if(redtph.getText().toString().length()>=6 && redtph.getText().toString().length()<=12){
+                    					saveFieldValue(Integer.parseInt(id), redtph.getText().toString());
+                    				}else if(redtph.getText().toString().length()<6){
+                						passport = false;
+                						redtph.setError("Telefono invalido. (muy corto)");
+                    				}else if(redtph.getText().toString().length()>12){
+                						passport = false;
+                						redtph.setError("Telefono invalido. (muy largo)");
+                    				}
+                    			}else{
+                    				saveFieldValue(Integer.parseInt(id), "NULL");
+                    			}
+                    			break;
+                    			
+                    		case 13:
+                    			// patente
+                    			EditText redtpa = (EditText) findViewById(Integer.parseInt(id));
+                    			Data= Data+label+": "+redtpa.getText()+"\n";
+                    			if(redtpa.getText().toString().length()>0){
+                    				if(ValidarPatente(redtpa.getText().toString())){
+                    					saveFieldValue(Integer.parseInt(id), redtpa.getText().toString());	
+                    				}else{
+                						passport = false;
+                						redtpa.setError("Patente invalida.");
+                    				}                    					
+                    			}else{
+                    				saveFieldValue(Integer.parseInt(id), "NULL");
+                    			}
+                    			break;
+
+                    		default:
+                    			try{
+                    				saveFieldValue(Integer.parseInt(id), "NULL");
+                    			}catch(Exception e){
+                    				Log.i("Error al capturar", e.getMessage());
+                    			}
+                    			break;
+                    		}
+                    	}
+                    	if(passport){
+	                    	Toast.makeText(formMaker.this, "Se acaban de guardar en tu equipo los siguientes datos:\n"+Data, Toast.LENGTH_SHORT).show();
+	                    	SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbfile, null);
+	                    	//Trabajar con la BD
+	                    	String[] args = new String[] {"0", sectionId};
+	                    	Cursor c = db.query("input",
+	                    			new String [] {"id", "section", "name", "type", "dep", "status"},
+	                    			"status = ? AND section = ?",
+	                    			args,
+	                    			null,
+	                    			null,
+	                    			null);
+	                    	llcont.removeAllViews();
+	                    	crearFormulario(c,db,itemspp,itemcount);
+	                    	c.close();
+	                    	db.close();
+                    	}
+                    }
                 });
                 
                 Button atras = new Button(formMaker.this);
@@ -399,19 +454,6 @@ public class formMaker extends Activity {
             	 String value;
             	 /*Campo*/
             	 Log.i("Aqui",""+Integer.parseInt(c.getString(3)));
-            	 
-            	/* if(c.getString(4)!=null){
-            		 Log.i("Este es dependiente", c.getString(4));
-            		 EditText instancia = (EditText) cont.findViewById(Integer.parseInt(c.getString(4)));
-            		 final String tag = c.getString(0);
-            		 instancia.setOnClickListener(new View.OnClickListener() {
-						public void onClick(View v) {
-							// TODO Es necesario hacer los campos que poseen cantidades grandes de datos dependientes.
-							Toast.makeText(formMaker.this, "Aqui deberia ocurrir algo en: "+ tag, Toast.LENGTH_LONG).show();
-						}
-            			 
-            		 });
-            	 }*/
             	 
             	 switch(Integer.parseInt(c.getString(3))){
             	 
@@ -557,7 +599,7 @@ public class formMaker extends Activity {
             	 case 6:
             		 // textedit email
             		 tv.setText(tv.getText()+"\nIngresa "+c.getString(2));
-            		 EditText edtm = new EditText(this);
+            		 final EditText edtm = new EditText(this);
             		 edtm.setId(Integer.parseInt(c.getString(0)));
             		 edtm.setTag(6);
             		 edtm.setInputType( InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS );
@@ -568,6 +610,7 @@ public class formMaker extends Activity {
             		 }
             		 
             		 break;
+            		 
             	 case 7:
             		// textedit rut
             		 tv.setText(tv.getText()+"\nIngresa "+c.getString(2));
@@ -575,14 +618,14 @@ public class formMaker extends Activity {
             		 edtr.setTag(7);
             		 edtr.setId(Integer.parseInt(c.getString(0)));
             		 edtr.setInputType(InputType.TYPE_CLASS_NUMBER);
-            		 edtr.setKeyListener(DigitsKeyListener.getInstance("0123456789.-"));;
+            		 edtr.setKeyListener(DigitsKeyListener.getInstance("0123456789-"));;
             		 cont.addView(edtr);
             		 value = getFieldValue(c.getInt(0));
             		 if(value != null){
             			 edtr .setText(value.toString());
             		 }
-            		 
             		 break;
+            		 
             	 case 8:
             		 // Mantiene las opciones que seran entragadas al spinner
             		 Cursor optionsauto = null;
@@ -683,8 +726,37 @@ public class formMaker extends Activity {
 						}
             		 });
             		 cont.addView(edti);
-            		 
             		 break;
+            		 
+            	 case 12:
+            		// textedit telefono
+            		 tv.setText(tv.getText()+"\nIngresa "+c.getString(2));
+            		 EditText edtph = new EditText(this);
+            		 edtph.setTag(12);
+            		 edtph.setId(Integer.parseInt(c.getString(0)));
+            		 edtph.setInputType(InputType.TYPE_CLASS_PHONE);
+            		 edtph.setKeyListener(DigitsKeyListener.getInstance("0123456789-"));
+            		 cont.addView(edtph);
+            		 value = getFieldValue(c.getInt(0));
+            		 if(value != null){
+            			 edtph.setText(value.toString());
+            		 }
+            		 break;
+            		 
+            	 case 13:
+            		// textedit patente
+            		 tv.setText(tv.getText()+"\nIngresa "+c.getString(2));
+            		 EditText edtpa = new EditText(this);
+            		 edtpa.setTag(13);
+            		 edtpa.setId(Integer.parseInt(c.getString(0)));
+            		 edtpa.setInputType(InputType.TYPE_CLASS_TEXT);
+            		 cont.addView(edtpa);
+            		 value = getFieldValue(c.getInt(0));
+            		 if(value != null){
+            			 edtpa .setText(value.toString());
+            		 }
+            		 break;
+            		 
             		 default:
             			 break;
 
@@ -880,6 +952,43 @@ public class formMaker extends Activity {
     @Override
     protected void onSaveInstanceState( Bundle outState ) {
     	outState.putBoolean( formMaker.PHOTO_TAKEN, _taken );
+    }
+    
+    /**
+     * Funciones para validar Imputs
+     */
+    // TODO
+    private boolean validateEmailAddress(String emailAddress){
+        String  expression="^[\\w\\-]([\\.\\w])+[\\w]+@([\\w\\-]+\\.)+[A-Z]{2,4}$";  
+           CharSequence inputStr = emailAddress;  
+           Pattern pattern = Pattern.compile(expression,Pattern.CASE_INSENSITIVE);  
+           Matcher matcher = pattern.matcher(inputStr);  
+           return matcher.matches();
+    }
+    public boolean ValidarRut(int rut, char dv){
+    	int m = 0, s = 1;
+        for (; rut != 0; rut /= 10)
+        {
+            s = (s + rut % 10 * (9 - m++ % 6)) % 11;
+        }
+        return dv == (char) (s != 0 ? s + 47 : 75);
+    }
+    public boolean ValidarPatente(String patente){
+    	String PATRON1 = "^[a-z]{2}[0-9a-z]{2}[0-9]{2}$";
+    	String PATRON2 = "^[b-d,f-h,j-l,p,r-t,v-z]{2}[-]?[b-d,f-h,j-l,p,r-t,v-z]{2}[-]?[0-9]{2}$";
+        Pattern pattern1 = Pattern.compile(PATRON1);
+        Pattern pattern2 = Pattern.compile(PATRON2);
+        Matcher matcher1 = pattern1.matcher(patente);
+        Matcher matcher2 = pattern2.matcher(patente);
+        boolean valid1 = matcher1.matches();
+        boolean valid2 = matcher2.matches();
+        if(valid1 || valid2){
+        	Log.i("VALIDA","VALIDA");
+            return true;
+        }else{
+        	Log.i("NOVALIDA","NOVALIDA");
+        	return false;
+        }
     }
 	
 }
