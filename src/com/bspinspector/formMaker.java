@@ -76,7 +76,7 @@ public class formMaker extends Activity {
 	/**Contador mantiene la referencia a la posicion en el total de items por formulario*/
 	int itemcount = 0;
 	/**Items por pagina*/
-	int itemspp = 0;
+	int itemspp = 4;
 	
 	/**Mantiene visible el archivo con la BD para generar los formularios*/
 	File dbfile;
@@ -269,7 +269,7 @@ public class formMaker extends Activity {
                     					}
                     				}else{
                 						passport = false;
-                						redtr.setError("RUT invalido.");
+                						redtr.setError("Formato RUT invalido.\n Ej: 11222333-4");
                     				}
                     			}else{
                     				saveFieldValue(Integer.parseInt(id), "NULL");
@@ -304,7 +304,7 @@ public class formMaker extends Activity {
                     					saveFieldValue(Integer.parseInt(id), redtpa.getText().toString());	
                     				}else{
                 						passport = false;
-                						redtpa.setError("Patente invalida.");
+                						redtpa.setError("Formato patente invalido.\n Ej: LL0000 o LLLL00");
                     				}                    					
                     			}else{
                     				saveFieldValue(Integer.parseInt(id), "NULL");
@@ -983,10 +983,8 @@ public class formMaker extends Activity {
         boolean valid1 = matcher1.matches();
         boolean valid2 = matcher2.matches();
         if(valid1 || valid2){
-        	Log.i("VALIDA","VALIDA");
             return true;
         }else{
-        	Log.i("NOVALIDA","NOVALIDA");
         	return false;
         }
     }

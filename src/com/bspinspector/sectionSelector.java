@@ -150,7 +150,7 @@ public class sectionSelector extends Activity {
     	                	 
     	                	 cont.setOnClickListener(new View.OnClickListener() {
     	                     	public void onClick(View v) {
-    	                     		Toast.makeText(sectionSelector.this, temp, Toast.LENGTH_SHORT).show();
+    	                     		Toast.makeText(sectionSelector.this, "Secci—n "+temp, Toast.LENGTH_SHORT).show();
     								Intent myIntent = new Intent(sectionSelector.this, formMaker.class);
     								myIntent.putExtra("user", user);
     								myIntent.putExtra("pass", pass);

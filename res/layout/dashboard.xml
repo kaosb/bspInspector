@@ -139,6 +139,25 @@
                     android:layout_gravity="center_vertical|center_horizontal" />
 			    
 	        </LinearLayout>
+	        
+			<LinearLayout
+			    android:id="@+id/LinearHBotonera3"
+	            android:layout_width="match_parent"
+	            android:layout_height="100dp"
+	            android:orientation="horizontal"
+	            android:gravity="center" >
+	            
+                <ImageView
+                    android:id="@+id/imageView5"
+                    android:layout_width="110dp"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/app_name"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:src="@drawable/btn_upload_inspecciones"
+                    android:layout_gravity="center_vertical|center_horizontal" />
+			    
+	        </LinearLayout>
             
         </LinearLayout>
 

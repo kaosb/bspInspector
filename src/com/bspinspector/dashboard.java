@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class dashboard extends Activity {
 	
@@ -62,6 +63,13 @@ public class dashboard extends Activity {
 		btnOcuenta.setOnClickListener(new OnClickListener() {
 			public void onClick(View arg0) {
 				finish();
+			}
+		});
+		
+		ImageView btnCasosUpload = (ImageView) findViewById(R.id.imageView5);
+		btnCasosUpload.setOnClickListener(new OnClickListener() {
+			public void onClick(View arg0) {
+				Toast.makeText(dashboard.this, "Caracteristica en desarrollo.", Toast.LENGTH_LONG).show();
 			}
 		});
 		
