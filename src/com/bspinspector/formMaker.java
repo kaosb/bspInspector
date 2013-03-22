@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -218,10 +219,17 @@ public class formMaker extends Activity {
                     			break;
 
                     		case 4:
-                    			// TODO Hay que hacer que esta shit funcione 
                     			RadioGroup rbg = (RadioGroup) findViewById(Integer.parseInt(id));
-                    			Data= Data+label+": "+rbg.getCheckedRadioButtonId()/100+"\n";
-                    			//saveFieldValue(Integer.parseInt(id),"");
+                    			if(rbg.getCheckedRadioButtonId() != -1){
+	                    			RadioButton rb = (RadioButton) findViewById(rbg.getCheckedRadioButtonId());
+	                    			Data= Data+label+": "+rb.getText()+"\n";
+	                    			if(rb.getText().toString().length()>0){
+	                    				saveFieldValue(Integer.parseInt(id), String.valueOf(rb.getText()));
+	                    			}else{
+	                    				saveFieldValue(Integer.parseInt(id), "NULL");
+	                    			}
+                    			}
+                    			
                     			break;
 
                     		case 5:
@@ -276,6 +284,28 @@ public class formMaker extends Activity {
                     			}
                     			break;
                     			
+                    		case 8:
+                    			EditText edtauto = (EditText) findViewById(Integer.parseInt(id));
+                    			Data= Data+label+": "+edtauto.getText()+"\n";
+                    			if(edtauto.getText().toString().length()>0){
+                    				saveFieldValue(Integer.parseInt(id), edtauto.getText().toString());
+                    			}else{
+                    				saveFieldValue(Integer.parseInt(id), "NULL");
+                    			}
+                    			break;
+                    			
+                    		case 9:
+                    			// TODO Hay que hacer el metodo para este tipo de datos
+                    			break;
+                    			
+                    		case 10:
+                    			// TODO Hay que hacer el metodo para este tipo de datos
+                    			break;
+                    			
+                    		case 11:
+                    			// TODO Hay que hacer el metodo para este tipo de datos
+                    			break;
+                    			
                     		case 12:
                     			// telefono
                     			EditText redtph = (EditText) findViewById(Integer.parseInt(id));
@@ -324,7 +354,7 @@ public class formMaker extends Activity {
 	                    	Toast.makeText(formMaker.this, "Se acaban de guardar en tu equipo los siguientes datos:\n"+Data, Toast.LENGTH_SHORT).show();
 	                    	SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbfile, null);
 	                    	//Trabajar con la BD
-	                    	String[] args = new String[] {"0", sectionId};
+	                    	String[] args = new String[] {"1", sectionId};
 	                    	Cursor c = db.query("input",
 	                    			new String [] {"id", "section", "name", "type", "dep", "status"},
 	                    			"status = ? AND section = ?",
@@ -374,7 +404,7 @@ public class formMaker extends Activity {
         	SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbfile, null);
             //Trabajar con la BD
         	Log.i("seccion", formMaker.this.sectionId);
-        	String[] argus = new String[] {"0",formMaker.this.sectionId};
+        	String[] argus = new String[] {"1",formMaker.this.sectionId};
         	Cursor c = db.query("input",
         						new String [] {"id", "section", "name", "type", "dep", "status"},
         						"status = ? AND section = ?",
@@ -491,7 +521,7 @@ public class formMaker extends Activity {
             		 		default:
             		 			// Consulto BD Con options
 	            		 			// Consultamos las opciones asociadas al input
-	            		 			String[] args1 = new String[] {"0",c.getString(0)};
+	            		 			String[] args1 = new String[] {"1",c.getString(0)};
 	            		 			options = db.query("option",
 	            		 					new String [] {"name"},
 	            		 					"status = ? AND input = ?",
@@ -562,24 +592,59 @@ public class formMaker extends Activity {
             	 case 4:
             		 //RadioGroup // radiobutton
             		 tv.setText(tv.getText()+"\nSelecciona "+c.getString(2));
+            		 // Consultamos las opciones asociadas al input
+            		 String[] args1 = new String[] {"1",c.getString(0)};
+            		 options = db.query("option",
+            				 new String [] {"id","name"},
+            				 "status = ? AND input = ?",
+            				 args1,
+            				 null,
+            				 null,
+            				 null);
+            		 // Obtenemos el numero de elementos.
+            		 count = options.getCount();
+            		 // Creamos el dario group que contendra los radiobuttons.
             		 final RadioButton[] rb = new RadioButton[3];
             		 RadioGroup rbg = new RadioGroup(this);
+            		 // Seteamos algunos elementos del radio group
             		 rbg.setId(Integer.parseInt(c.getString(0)));
             		 rbg.setTag(4);
             		 rbg.setOrientation(RadioGroup.HORIZONTAL);
             		 rbg.clearCheck();
-            		 
-            		    for(int i=0; i<3; i++){
-            		        rb[i]  = new RadioButton(this);
-            		        rb[i].setId(Integer.parseInt(c.getString(0))*100);
-            		        rbg.addView(rb[i]);
-            		        rb[i].setText("Test "+i);
-            		        rb[i].setTextSize(14);
-            		        rb[i].setTextColor(Color.parseColor("#080A1D"));
-            		    }
-
+            		 // Verificamos si tenemos data almacenada
+            		 value = getFieldValue(c.getInt(0));
+            		 // Creamos el indice
+            		 int i = 0;
+            		 // Determino si existen opciones para agregar al radiogroup
+            		 if(count > 0){
+            		 //Si el cursor puede continuar el bucle continuara.
+            		 while(options.moveToNext() && options.getPosition() < count){
+            			 rb[i]  = new RadioButton(this);
+            			 rb[i].setId(Integer.parseInt(options.getString(0)));
+            			 rb[i].setText(options.getString(1));
+            			 rb[i].setTextSize(14);
+            			 rb[i].setTextColor(Color.parseColor("#080A1D"));
+            			 if(value != null && rb[i].getText().equals(value.toString())){
+            				 rb[i].setChecked(true);
+            			 }
+            			 rbg.addView(rb[i]);
+            			 i++;
+            		 }
+            		 }else{
+            			 // Si no existen opciones en la BD agrego 3 numeros como opciones a modo de pruebas.
+            			 for(int j=0;j<3;j++){
+                			 rb[j]  = new RadioButton(this);
+                			 int randInt = new Random().nextInt(2);
+                			 rb[j].setId(j+randInt);
+                			 rb[j].setText(String.valueOf(j+1));
+                			 rb[j].setTextSize(14);
+                			 rb[j].setTextColor(Color.parseColor("#080A1D"));
+                			 rb[j].setEnabled(false);
+                			 rbg.addView(rb[j]);
+            			 }
+            		 }
             		 cont.addView(rbg);
-            		 
+
             		 break;
             	 case 5:
             		 // textedit numero
@@ -639,6 +704,10 @@ public class formMaker extends Activity {
 	            			 optionsauto = getCustomFieldDataContent(db, "modelos", "nombreModelo");
 	            			 countauto = optionsauto.getCount();
 	            			 break;
+         		 		case 4:
+         		 			optionsauto = getCustomFieldDataContent(db, "comuna", "nombreComuna");
+        		 			countauto = optionsauto.getCount();
+        		 			break;
             		 }
             		 if(countauto != 0){
 	        			 // creo pero no inicializo el array items
@@ -957,7 +1026,6 @@ public class formMaker extends Activity {
     /**
      * Funciones para validar Imputs
      */
-    // TODO
     private boolean validateEmailAddress(String emailAddress){
         String  expression="^[\\w\\-]([\\.\\w])+[\\w]+@([\\w\\-]+\\.)+[A-Z]{2,4}$";  
            CharSequence inputStr = emailAddress;  
