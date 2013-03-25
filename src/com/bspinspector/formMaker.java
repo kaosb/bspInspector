@@ -12,18 +12,16 @@ import java.util.regex.Pattern;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
+import android.app.TimePickerDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.InputType;
 import android.text.method.DigitsKeyListener;
@@ -38,23 +36,20 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 public class formMaker extends Activity {
 	
-	protected ImageView _image;
-	protected TextView _field;
-	protected String _path;
-	protected boolean _taken;
-	
-	protected static final String PHOTO_TAKEN	= "photo_taken";
+	public static final int CAMERA_REQUEST = 1000;
+	public Uri mFileUri = null;
+	public TextView filesUploaded;
 	
 	private String user;
 	private String cod_ubicacion;
@@ -175,7 +170,7 @@ public class formMaker extends Activity {
                     	for (int i=0; i < childcount; i++){
                     		View vista = llcont.getChildAt(i);
                     		LinearLayout lltemp = (LinearLayout) vista;
-                    		Log.i("TAG:", "PreguntaID->"+llcont.getChildAt(i).getTag()+" FieldType:"+llcont.getChildAt(1).getTag());
+                    		Log.i("TAG:", "PreguntaID->"+llcont.getChildAt(i).getTag()+" FieldType:"+ lltemp.getChildAt(1).getTag());
                     		String id = (String) llcont.getChildAt(i).getTag();
                     		// Que pasa cuando viene un checkbox??????
                     		// Este id al parecer no viene
@@ -183,7 +178,7 @@ public class formMaker extends Activity {
                     		try{
                     			type = (Integer) lltemp.getChildAt(1).getTag();
                     		}catch(Exception e){
-                    			type = 3;
+                    			type = 1;
                     		}
                     		TextView txtTemp = (TextView) lltemp.getChildAt(0);
                     		String label = (String) txtTemp.getText();
@@ -295,15 +290,28 @@ public class formMaker extends Activity {
                     			break;
                     			
                     		case 9:
-                    			// TODO Hay que hacer el metodo para este tipo de datos
+                    			EditText redtd = (EditText) findViewById(Integer.parseInt(id));
+                    			Data= Data+label+": "+redtd.getText()+"\n";
+                    			if(redtd.getText().toString().length()>0){
+                    				saveFieldValue(Integer.parseInt(id), redtd.getText().toString());
+                    			}else{
+                    				saveFieldValue(Integer.parseInt(id), "NULL");
+                    			}
+                    			
                     			break;
                     			
                     		case 10:
-                    			// TODO Hay que hacer el metodo para este tipo de datos
+                    			Data= Data+label+"Imagenes: "+filesUploaded.getText()+"";
+                    			if(filesUploaded.getText().toString().length()>0){
+                    				saveFieldValue(Integer.parseInt(id), filesUploaded.getText().toString());
+                    			}else{
+                    				saveFieldValue(Integer.parseInt(id), "NULL");
+                    			}
+                    			
                     			break;
                     			
                     		case 11:
-                    			// TODO Hay que hacer el metodo para este tipo de datos
+                    			// TODO Hay que hacer el metodo para este tipo de datos FIRMA
                     			break;
                     			
                     		case 12:
@@ -339,6 +347,17 @@ public class formMaker extends Activity {
                     			}else{
                     				saveFieldValue(Integer.parseInt(id), "NULL");
                     			}
+                    			break;
+                    			
+                    		case 14:
+                    			EditText redtti = (EditText) findViewById(Integer.parseInt(id));
+                    			Data= Data+label+": "+redtti.getText()+"\n";
+                    			if(redtti.getText().toString().length()>0){
+                    				saveFieldValue(Integer.parseInt(id), redtti.getText().toString());
+                    			}else{
+                    				saveFieldValue(Integer.parseInt(id), "NULL");
+                    			}
+                    			
                     			break;
 
                     		default:
@@ -754,8 +773,7 @@ public class formMaker extends Activity {
             		 edtf.setTag(9);
             		 edtf.setInputType(InputType.TYPE_DATETIME_VARIATION_NORMAL);
             		 edtf.setOnClickListener(new View.OnClickListener() {
-						public void onClick(View v) {
-					        // Use the current date as the default date in the picker
+						public void onClick(View v){
 					        final Calendar c = Calendar.getInstance();
 					        int year = c.get(Calendar.YEAR);
 					        int month = c.get(Calendar.MONTH);
@@ -765,36 +783,67 @@ public class formMaker extends Activity {
 					        		edtf.setText(String.valueOf(dayOfMonth)+"-"+String.valueOf(monthOfYear)+"-"+String.valueOf(year));
 					        	}
 					        };
-							// Create a new instance of DatePickerDialog and return it
 					        DatePickerDialog fecha = new DatePickerDialog(formMaker.this, mDateSetListener, year, month, day);
 					        fecha.show();
 						}
             		 });
+            		 value = getFieldValue(c.getInt(0));
+            		 if(value != null){
+            			 edtf.setText(value.toString());
+            		 }
             		 
             		 cont.addView(edtf);
             		 
             		 break;
             	 case 10:
             		 // textedit imagen
-            		 tv.setText(tv.getText()+"\nToma "+c.getString(2));
-            		 final EditText edti = new EditText(this);
+            		 // Esto podria ser un boton o otro elemento de la interfaz.
+            		 /*EditText edti = new EditText(this);
             		 edti.setId(Integer.parseInt(c.getString(0)));
             		 edti.setTag(10);
-            		 edti.setInputType(InputType.TYPE_TEXT_VARIATION_NORMAL);
-            		 edti.setOnClickListener(new View.OnClickListener() {
-						public void onClick(View v){
-							Toast.makeText(formMaker.this, "Aproach preliminar de la funcionalidad de captura de imagenes.", Toast.LENGTH_LONG).show();
-							_path = Environment.getExternalStorageDirectory() + "/images/make_machine_example.jpg";
-							_field = edti;
-					    	File file = new File( _path );
-					    	Uri outputFileUri = Uri.fromFile( file );
-					    	Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE );
-					    	
-					    	intent.putExtra( MediaStore.EXTRA_OUTPUT, outputFileUri );
-					    	startActivityForResult( intent, 0 );
-						}
+            		 edti.setInputType(InputType.TYPE_TEXT_VARIATION_NORMAL);*/
+            		 Button aimg = new Button(this);
+            		 aimg.setText(c.getString(2));
+            		 aimg.setTag(10);
+            		 aimg.setId(Integer.parseInt(c.getString(0)));
+            		 filesUploaded = new TextView(this);
+            		 filesUploaded.setTextColor(Color.BLUE);
+            		 // Esto podria ser un booton o otro tipo de elemento de la interfaz.
+            		 aimg.setOnClickListener(new View.OnClickListener(){
+            			 public void onClick(View v){
+            				 // Alerta que indica que se trata de una prueba de la camara.
+            				 Toast.makeText(formMaker.this, "Aproach preliminar de la funcionalidad de captura de imagenes.", Toast.LENGTH_LONG).show();
+            				 // Obtenemos el path principal para almacenar la imagen que capturemos.
+            				 File root = android.os.Environment.getExternalStorageDirectory();
+            				 File dir = new File (root.getAbsolutePath() + "/bspinspector/"+user+"/images");
+            				 if(dir.exists()==false) {
+            					 dir.mkdirs();
+            				 }
+            				 // Obtenemos un timestamp para formar el nombre de la imagen a capturar.
+            				 Long tsLong = System.currentTimeMillis()/1000;
+            				 String ts = tsLong.toString();
+            				 // Creamos el archivo en el cual guardaremos la imagen que capturemos.
+            				 File file = new File (dir, cod_ubicacion + "_" + ts + ".jpg");
+            				 //Uri outputFileUri = Uri.fromFile(file);
+            				 mFileUri = Uri.fromFile(file);
+            				 // El intent que nos permite utilizar la camara.
+            				 Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            				 // Le entrego donde guardar la imagen
+            				 intent.putExtra(MediaStore.EXTRA_OUTPUT, mFileUri);
+            				 // Lanzamos la actividad
+            				 startActivityForResult(intent, CAMERA_REQUEST); 
+            			 }
             		 });
-            		 cont.addView(edti);
+            		 cont.addView(aimg);
+            		 value = getFieldValue(c.getInt(0));
+            		 if(value != null){
+            			 filesUploaded.setText(value.toString());
+            		 }
+            		 cont.addView(filesUploaded);
+            		 break;
+            		 
+            	 case 11:
+            		 // TODO Hay que hacer el metodo para este tipo de datos FIRMA
             		 break;
             		 
             	 case 12:
@@ -824,6 +873,35 @@ public class formMaker extends Activity {
             		 if(value != null){
             			 edtpa .setText(value.toString());
             		 }
+            		 break;
+            		 
+            	 case 14:
+            		 // textedit hora/minuto
+            		 tv.setText(tv.getText()+"\nIngresa "+c.getString(2));
+            		 final EditText edth = new EditText(this);
+            		 edth.setId(Integer.parseInt(c.getString(0)));
+            		 edth.setTag(9);
+            		 edth.setInputType(InputType.TYPE_DATETIME_VARIATION_NORMAL);
+            		 edth.setOnClickListener(new View.OnClickListener() {
+            			 public void onClick(View v) {
+            				 final Calendar c = Calendar.getInstance();
+            				 int hourOfDay = c.get(Calendar.HOUR);
+            				 int minute = c.get(Calendar.MINUTE);
+            				 TimePickerDialog.OnTimeSetListener mTimeSetListener = new TimePickerDialog.OnTimeSetListener(){
+								public void onTimeSet(TimePicker view, int hourOfDay, int minute){
+									edth.setText(String.valueOf(hourOfDay)+":"+String.valueOf(minute));
+								}
+            				 };
+            				 TimePickerDialog hora = new TimePickerDialog(formMaker.this, mTimeSetListener, hourOfDay, minute, false);
+            				 hora.show();
+            			 }
+            		 });
+            		 value = getFieldValue(c.getInt(0));
+            		 if(value != null){
+            			 edth.setText(value.toString());
+            		 }
+            		 cont.addView(edth);
+            		 
             		 break;
             		 
             		 default:
@@ -977,52 +1055,7 @@ public class formMaker extends Activity {
 		data = db.rawQuery("SELECT * FROM "+tableName, null);
 		return data;
 	}
-	
-	/**
-	 * photoPicker
-	 * Funciones para capturar imagenes.
-	 * */
-	@Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) 
-    {	
-    	Log.i( "MakeMachine", "resultCode: " + resultCode );
-    	switch( resultCode )
-    	{
-    		case 0:
-    			Log.i( "MakeMachine", "User cancelled" );
-    			break;
-    			
-    		case -1:
-    			onPhotoTaken();
-    			break;
-    	}
-    }
-    protected void onPhotoTaken()
-    {
-    	Log.i( "MakeMachine", "onPhotoTaken" );
-    	_taken = true;
-    	
-    	BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inSampleSize = 4;
-    	
-    	Bitmap bitmap = BitmapFactory.decodeFile( _path, options );
-    	
-    	_image.setImageBitmap(bitmap);
-    	
-    	_field.setVisibility( View.GONE );
-    }
-    @Override 
-    protected void onRestoreInstanceState( Bundle savedInstanceState){
-    	Log.i( "MakeMachine", "onRestoreInstanceState()");
-    	if( savedInstanceState.getBoolean( formMaker.PHOTO_TAKEN ) ) {
-    		onPhotoTaken();
-    	}
-    }
-    @Override
-    protected void onSaveInstanceState( Bundle outState ) {
-    	outState.putBoolean( formMaker.PHOTO_TAKEN, _taken );
-    }
-    
+
     /**
      * Funciones para validar Imputs
      */
@@ -1056,5 +1089,27 @@ public class formMaker extends Activity {
         	return false;
         }
     }
-	
+    
+	/**
+	 * photoPicker
+	 * Funciones para capturar imagenes.
+	 * */
+    
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == CAMERA_REQUEST){
+			if (resultCode == RESULT_OK){
+				Log.v("mylog","camera OK" + formMaker.this.mFileUri);
+				String[] filepatharr = formMaker.this.mFileUri.toString().split("/");
+				filesUploaded.setText(filesUploaded.getText()+"\n"+filepatharr[filepatharr.length-1]);
+			}
+			else if (resultCode == RESULT_CANCELED) {
+				Log.v("mylog","camera canceled");
+			}
+			else {
+				Log.v("mylog","camera error");
+			}
+		}
+	}
+
 }
