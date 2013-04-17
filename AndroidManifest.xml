@@ -24,5 +24,6 @@
         <activity android:name=".getNuevosCasos"/>
         <activity android:name=".settings"/>
         <activity android:name=".asyncSnippet"/>
+        <activity android:name=".preExistence"/>
     </application>
 </manifest>

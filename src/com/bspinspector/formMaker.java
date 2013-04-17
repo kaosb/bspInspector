@@ -170,9 +170,9 @@ public class formMaker extends Activity {
                     	for (int i=0; i < childcount; i++){
                     		View vista = llcont.getChildAt(i);
                     		LinearLayout lltemp = (LinearLayout) vista;
-                    		Log.i("TAG:", "PreguntaID->"+llcont.getChildAt(i).getTag()+" FieldType:"+ lltemp.getChildAt(1).getTag());
+                    		//Log.i("TAG:", "PreguntaID->"+llcont.getChildAt(i).getTag()+" FieldType:"+ lltemp.getChildAt(1).getTag());
                     		String id = (String) llcont.getChildAt(i).getTag();
-                    		// Que pasa cuando viene un checkbox??????
+                    		Log.i("BLEBLE", (String) llcont.getChildAt(i).getTag());
                     		// Este id al parecer no viene
                     		int type = 0;
                     		try{
@@ -374,13 +374,14 @@ public class formMaker extends Activity {
 	                    	SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbfile, null);
 	                    	//Trabajar con la BD
 	                    	String[] args = new String[] {"1", sectionId};
+	                    	String orderBy =   "orden ASC";
 	                    	Cursor c = db.query("input",
 	                    			new String [] {"id", "section", "name", "type", "dep", "status"},
 	                    			"status = ? AND section = ?",
 	                    			args,
 	                    			null,
 	                    			null,
-	                    			null);
+	                    			orderBy);
 	                    	llcont.removeAllViews();
 	                    	crearFormulario(c,db,itemspp,itemcount);
 	                    	c.close();
@@ -440,10 +441,6 @@ public class formMaker extends Activity {
         	formMaker.this.pd.dismiss();
         }
 	} 
-	/**
-	 * fin clase AsyncTask
-	 * */
-	
 	
 	/**
 	 * GET Archivo DB
@@ -459,6 +456,7 @@ public class formMaker extends Activity {
         File dbfile = new File(dir + "/BSP.sqlite");
         return dbfile;
 	}
+	
 	/**
 	 * Get Index of value from spinner adapter
 	 */
@@ -520,80 +518,70 @@ public class formMaker extends Activity {
             		 }
             		 break;
             	 case 2:
-            		 		// Mantiene las opciones que seran entragadas al spinner
-            		 		Cursor options = null;
-            		 		// Contador auxiliar que se usa en los bucles para paginar segun lo configurado.
-            		 		int count = 0;
-            		 		switch(Integer.parseInt(c.getString(0))){
-            		 		case 3:
-            		 			options = getCustomFieldDataContent(db, "region", "nombreRegion");
-            		 			count = options.getCount();
-            		 			break;
-            		 		case 4:
-            		 			options = getCustomFieldDataContent(db, "comuna", "nombreComuna");
-            		 			count = options.getCount();
-            		 			break;
-            		 		case 19:
-            		 			options = getCustomFieldDataContent(db, "tipos_vehiculo", "tipo");
-            		 			count = options.getCount();
-            		 			break;
-            		 		default:
-            		 			// Consulto BD Con options
-	            		 			// Consultamos las opciones asociadas al input
-	            		 			String[] args1 = new String[] {"1",c.getString(0)};
-	            		 			options = db.query("option",
-	            		 					new String [] {"name"},
-	            		 					"status = ? AND input = ?",
-	            		 					args1,
-	            		 					null,
-	            		 					null,
-	            		 					null);
-	            		 			count = options.getCount();
-            		 			break;
-            		 		}
-		            		// creo pero no inicializo el array items
-		                	String[] items;
-		                	
-		                	// Aqui se traspasa los objetos en el Cursor con opciones al array items el cual es entregado al spinner adapter.
-		                	if(options.moveToFirst()){
-		                		items = new String[count];
-		                		int temp = 0;
-		                		do{
-		                			items[temp] = options.getString(0);
-		                			temp++;
-		                		}while(options.moveToNext() && options.getPosition() < options.getCount() );
-		                	}else{
-		                		items = new String[] {"1","2","3","4"};
-		                	}
-		                	
-		                	// Cerramos el Cursor que contenia las opciones
-		                	options.close();
-		                	// Texto titulo
-		                	tv.setText(tv.getText()+"\nSelecciona "+c.getString(2));
-		                	
-		                	
-		                	
-		                	// Setting del spinner y el adaptador al cual le paso un array con el contendio.
-		                	Spinner select = new Spinner(this);
-		                	select.setId(Integer.parseInt(c.getString(0)));
-		                	select.setTag(2);
-		                	select.setPrompt("Selecciona "+c.getString(2));
-		                	ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, items);
-		                	adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		                	select.setAdapter(adapter);
-		                	//Get saved value
-		                	value = getFieldValue(c.getInt(0));
-		                	if(value != null){
-		                		//int pos = Arrays.binarySearch(items, value);
-		                		int pos = this.indexOf(adapter, value);
-		                		Log.i("posicion seleccionado", String.valueOf(pos));
-		                		select.setSelection(pos);
-		                	}
-		                	// Lo agrego a la vista
-		                	cont.addView(select);
-		                	
-		                	
-		                	break;
+            		 // Mantiene las opciones que seran entragadas al spinner
+            		 Cursor options = null;
+            		 // Contador auxiliar que se usa en los bucles para paginar segun lo configurado.
+            		 int count = 0;
+            		 switch(Integer.parseInt(c.getString(0))){
+            		 case 4334:
+            			 options = getCustomFieldDataContent(db, "tipos_vehiculo", "tipo");
+            			 count = options.getCount();
+            			 break;
+            		 default:
+            			 // Consulto BD Con options
+            			 // Consultamos las opciones asociadas al input
+            			 String[] args1 = new String[] {"1",c.getString(0)};
+            			 options = db.query("option",
+            					 new String [] {"name"},
+            					 "status = ? AND input = ?",
+            					 args1,
+            					 null,
+            					 null,
+            					 null);
+            			 count = options.getCount();
+            			 break;
+            		 }
+            		 // creo pero no inicializo el array items
+            		 String[] items;
+
+            		 // Aqui se traspasa los objetos en el Cursor con opciones al array items el cual es entregado al spinner adapter.
+            		 if(options.moveToFirst()){
+            			 items = new String[count];
+            			 int temp = 0;
+            			 do{
+            				 items[temp] = options.getString(0);
+            				 temp++;
+            			 }while(options.moveToNext() && options.getPosition() < options.getCount() );
+            		 }else{
+            			 items = new String[] {"1","2","3","4"};
+            		 }
+
+            		 // Cerramos el Cursor que contenia las opciones
+            		 options.close();
+            		 // Texto titulo
+            		 tv.setText(tv.getText()+"\nSelecciona "+c.getString(2));
+
+
+
+            		 // Setting del spinner y el adaptador al cual le paso un array con el contendio.
+            		 Spinner select = new Spinner(this);
+            		 select.setId(Integer.parseInt(c.getString(0)));
+            		 select.setTag(2);
+            		 select.setPrompt("Selecciona "+c.getString(2));
+            		 ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, items);
+            		 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            		 select.setAdapter(adapter);
+            		 //Get saved value
+            		 value = getFieldValue(c.getInt(0));
+            		 if(value != null){
+            			 //int pos = Arrays.binarySearch(items, value);
+            			 int pos = this.indexOf(adapter, value);
+            			 Log.i("posicion seleccionado", String.valueOf(pos));
+            			 select.setSelection(pos);
+            		 }
+            		 // Lo agrego a la vista
+            		 cont.addView(select);
+            		 break;
             	 case 3:
             		 //checkbox
             		 tv.setText(tv.getText()+"\n"+c.getString(2));
@@ -715,19 +703,24 @@ public class formMaker extends Activity {
             		 Cursor optionsauto = null;
             		 int countauto = 0;
             		 switch(Integer.parseInt(c.getString(0))){
-	            		 case 23:
+	            		 case 4329:
 	            			 optionsauto = getCustomFieldDataContent(db, "marcas", "nombreMarca");
 	            			 countauto = optionsauto.getCount();
 	            			 break;
-	            		 case 24:
+	            		 case 4330:
 	            			 optionsauto = getCustomFieldDataContent(db, "modelos", "nombreModelo");
 	            			 countauto = optionsauto.getCount();
 	            			 break;
-         		 		case 4:
+	            		 case 4327:
+	            			 optionsauto = getCustomFieldDataContent(db, "colores", "color");
+	            			 countauto = optionsauto.getCount();
+	            			 break;
+         		 		case 4325:
          		 			optionsauto = getCustomFieldDataContent(db, "comuna", "nombreComuna");
         		 			countauto = optionsauto.getCount();
         		 			break;
             		 }
+            		 // TODO NO ESTA FUNCIONANDO
             		 if(countauto != 0){
 	        			 // creo pero no inicializo el array items
 	        			 String[] itemsauto;
@@ -1037,7 +1030,6 @@ public class formMaker extends Activity {
 	/**
 	 * getCustomDataContent
 	 * funcion que obtiene datos de un campo especifico de la tabla especificada y retorna un cursos con la informacion respectiva.
-	 * @return 
 	 */
 	public Cursor getCustomFieldDataContent(SQLiteDatabase db, String tableName, String fieldName){
 		Cursor data = null;
@@ -1048,7 +1040,6 @@ public class formMaker extends Activity {
 	/**
 	 * getTableDataContent
 	 * funcion que obtiene toda la informacion de la tabla especificada.
-	 * @return 
 	 */
 	public Cursor getTableDataContent(SQLiteDatabase db, String tableName){
 		Cursor data = null;

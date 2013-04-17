@@ -67,8 +67,8 @@ public class sectionSelector extends Activity {
             	
             	SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbfile, null);
                 /*Trabajar con la BD*/
-                	String[] args = new String[] {"0"};
-                	Cursor c = db.rawQuery("SELECT * FROM section WHERE status=?",args);
+                	String[] args = new String[] {"1"};
+                	Cursor c = db.rawQuery("SELECT * FROM section WHERE status=? ORDER BY orden ASC",args);
                 	
     	            ScrollView sv = new ScrollView(sectionSelector.this);
     	            final LinearLayout ll = new LinearLayout(sectionSelector.this);
@@ -82,7 +82,7 @@ public class sectionSelector extends Activity {
     	            cabecera.setPadding(15, 5, 5, 5);
     	            TextView nombre = new TextView(sectionSelector.this);
     	            nombre.setText(sectionSelector.this.user);
-    	            nombre.setTextSize(18);
+    	            nombre.setTextSize(12);
     	            nombre.setTextColor(Color.parseColor("#FDFDFD"));
     	            nombre.setTypeface(null, Typeface.BOLD);
     	            cabecera.addView(nombre);
@@ -151,7 +151,16 @@ public class sectionSelector extends Activity {
     	                	 cont.setOnClickListener(new View.OnClickListener() {
     	                     	public void onClick(View v) {
     	                     		Toast.makeText(sectionSelector.this, "Secci—n "+temp, Toast.LENGTH_SHORT).show();
-    								Intent myIntent = new Intent(sectionSelector.this, formMaker.class);
+    	                     		Intent myIntent = null;
+    	                     		// Detectar si son las pre-existencias
+    	                     		if(Integer.parseInt(temp.toString()) == 5){
+    	                     			// Si es ua pre existencia.
+    	                     			myIntent = new Intent(sectionSelector.this, preExistence.class);
+        								myIntent.putExtra("glosaMarca", sectionSelector.this.glosaMarca);
+        								myIntent.putExtra("glosaModelo", sectionSelector.this.glosaModelo);
+    	                     		}else{
+    	                     			myIntent = new Intent(sectionSelector.this, formMaker.class);
+    	                     		}
     								myIntent.putExtra("user", user);
     								myIntent.putExtra("pass", pass);
     								myIntent.putExtra("sectionId", temp);
